@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2160" height="1740" viewBox="0 0 2160 1740" role="img" aria-labelledby="title desc">
+  <title id="title">Galileo Galilei - DER del esquema ORM actual</title>
+  <desc id="desc">Diagrama de las 16 tablas SQLAlchemy existentes y sus claves foraneas declaradas en app/models.py.</desc>
+  <defs>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #182230; }
+      .page { fill: #f4f7fb; }
+      .title { font-size: 38px; font-weight: 700; }
+      .subtitle { font-size: 18px; fill: #526174; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .head-core { fill: #176b68; }
+      .head-academic { fill: #315b8a; }
+      .head-finance { fill: #9a5b16; }
+      .head-crm { fill: #7d4f78; }
+      .head-ops { fill: #526174; }
+      .headtext { fill: #ffffff; font-size: 20px; font-weight: 700; }
+      .field { font-size: 16px; }
+      .key { font-size: 12px; font-weight: 700; fill: #ffffff; }
+      .badge-pk { fill: #176b68; }
+      .badge-fk { fill: #315b8a; }
+      .badge-uk { fill: #9a5b16; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .paneltitle { font-size: 21px; font-weight: 700; }
+      .relation { font-size: 15px; }
+      .foot { font-size: 15px; fill: #526174; }
+    </style>
+  </defs>
+  <rect class="page" width="2160" height="1740"/>
+  <text class="title" x="70" y="64">Galileo Galilei | Esquema de base de datos actual</text>
+  <text class="subtitle" x="70" y="98">16 tablas ORM declaradas en app/models.py · PK = clave primaria · FK = clave foranea · UK = valor unico</text>
+
+  <g transform="translate(70 135)">
+    <rect class="card" width="610" height="220"/><path class="head-core" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">TUTOR</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <rect class="badge-uk" x="18" y="94" width="38" height="20" rx="4"/><text class="key" x="25" y="109">UK</text><text class="field" x="68" y="110">dni_cuit: VARCHAR(20), NOT NULL</text>
+    <text class="field" x="20" y="136">nombre: VARCHAR(200), NOT NULL</text><text class="field" x="20" y="162">email: VARCHAR(200), NULL</text><text class="field" x="20" y="188">telefono: VARCHAR(50), NULL</text><text class="field" x="320" y="188">direccion: VARCHAR(255), NULL</text>
+  </g>
+  <g transform="translate(70 375)">
+    <rect class="card" width="610" height="170"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">ANIO_LECTIVO</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <rect class="badge-uk" x="18" y="94" width="38" height="20" rx="4"/><text class="key" x="25" y="109">UK</text><text class="field" x="68" y="110">numero_ciclo: INTEGER, NOT NULL</text>
+    <text class="field" x="20" y="136">fecha_inicio: DATE, NOT NULL</text><text class="field" x="320" y="136">fecha_fin: DATE, NOT NULL</text>
+  </g>
+  <g transform="translate(70 565)">
+    <rect class="card" width="610" height="145"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">NIVEL_GRADO</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <text class="field" x="20" y="112">nombre_nivel: VARCHAR(100), NOT NULL</text><text class="field" x="20" y="136">grado_año: VARCHAR(100), NOT NULL</text>
+  </g>
+  <g transform="translate(70 730)">
+    <rect class="card" width="610" height="195"/><path class="head-finance" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">DESCUENTO_TIPO</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <rect class="badge-uk" x="18" y="94" width="38" height="20" rx="4"/><text class="key" x="25" y="109">UK</text><text class="field" x="68" y="110">codigo: VARCHAR(50), NOT NULL</text>
+    <text class="field" x="20" y="136">nombre: VARCHAR(120), NOT NULL</text><text class="field" x="20" y="162">porcentaje: FLOAT, default 0.0</text><text class="field" x="320" y="162">activo: BOOLEAN, default true</text><text class="field" x="20" y="186">descripcion: TEXT, NULL</text>
+  </g>
+  <g transform="translate(70 945)">
+    <rect class="card" width="610" height="170"/><path class="head-ops" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">DOCENTE</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <text class="field" x="20" y="110">nombre: VARCHAR(180), NOT NULL</text><rect class="badge-uk" x="18" y="120" width="38" height="20" rx="4"/><text class="key" x="25" y="135">UK</text><text class="field" x="68" y="136">legajo_laboral: VARCHAR(50), NOT NULL</text><text class="field" x="20" y="162">especialidad: VARCHAR(150), NULL</text>
+  </g>
+  <g transform="translate(70 1135)">
+    <rect class="card" width="610" height="195"/><path class="head-crm" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">ASPIRANTE_CRM</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <text class="field" x="20" y="110">nombre_tutor: VARCHAR(200), NOT NULL</text><text class="field" x="20" y="136">telefono_whatsapp: VARCHAR(50), NULL</text><text class="field" x="20" y="162">curso_interes: VARCHAR(100), NULL</text><text class="field" x="20" y="188">estado_entrevista: VARCHAR(80), NULL · observaciones: TEXT</text>
+  </g>
+
+  <g transform="translate(740 135)">
+    <rect class="card" width="610" height="245"/><path class="head-core" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">ALUMNO</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <rect class="badge-fk" x="18" y="94" width="38" height="20" rx="4"/><text class="key" x="25" y="109">FK</text><text class="field" x="68" y="110">id_tutor → tutor.id: INTEGER, NOT NULL</text>
+    <text class="field" x="20" y="136">nombre: VARCHAR(120), NOT NULL</text><text class="field" x="20" y="162">apellido: VARCHAR(120), NOT NULL</text><rect class="badge-uk" x="18" y="172" width="38" height="20" rx="4"/><text class="key" x="25" y="187">UK</text><text class="field" x="68" y="188">dni: VARCHAR(20), NOT NULL</text><text class="field" x="20" y="214">fecha_nacimiento: DATE, NULL · legajo: VARCHAR(50), UK/NULL</text>
+  </g>
+  <g transform="translate(740 400)">
+    <rect class="card" width="610" height="170"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">GRUPO_SECCION</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <rect class="badge-fk" x="18" y="94" width="38" height="20" rx="4"/><text class="key" x="25" y="109">FK</text><text class="field" x="68" y="110">id_nivel → nivel_grado.id: INTEGER</text><text class="field" x="20" y="136">seccion: VARCHAR(50), NOT NULL</text><text class="field" x="320" y="136">capacidad_maxima: INTEGER, default 30</text>
+  </g>
+  <g transform="translate(740 590)">
+    <rect class="card" width="610" height="245"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">MATRICULA</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <rect class="badge-fk" x="18" y="94" width="38" height="20" rx="4"/><text class="key" x="25" y="109">FK</text><text class="field" x="68" y="110">id_alumno → alumno.id: INTEGER</text>
+    <text class="field" x="20" y="136">id_anio → anio_lectivo.id: INTEGER, FK</text><text class="field" x="20" y="162">id_grupo → grupo_seccion.id: INTEGER, FK</text><text class="field" x="20" y="188">id_descuento → descuento_tipo.id: INTEGER, FK/NULL</text><text class="field" x="20" y="214">fecha_inscripcion: DATE, default hoy</text><text class="field" x="20" y="238">estado: VARCHAR(50), default 'Activa'</text>
+  </g>
+  <g transform="translate(740 855)">
+    <rect class="card" width="610" height="145"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">ASIGNATURA</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text><text class="field" x="20" y="110">nombre_materia: VARCHAR(150), NOT NULL</text><text class="field" x="20" y="136">carga_horaria: INTEGER, default 0</text>
+  </g>
+  <g transform="translate(740 1020)">
+    <rect class="card" width="610" height="195"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">CURSO_DIRECCION</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <text class="field" x="20" y="110">id_docente → docente.id: INTEGER, FK</text><text class="field" x="20" y="136">id_asignatura → asignatura.id: INTEGER, FK</text><text class="field" x="20" y="162">id_grupo → grupo_seccion.id: INTEGER, FK</text><text class="field" x="20" y="188">horario: VARCHAR(120), NULL</text>
+  </g>
+  <g transform="translate(740 1235)">
+    <rect class="card" width="610" height="275"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">CALIFICACION</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <text class="field" x="20" y="110">id_matricula → matricula.id: INTEGER, FK</text><text class="field" x="20" y="136">id_curso_dir → curso_direccion.id: INTEGER, FK</text><text class="field" x="20" y="162">diagnostico: VARCHAR(20), NULL · parcial_1: VARCHAR(20), NULL</text><text class="field" x="20" y="188">parcial_2: VARCHAR(20), NULL · eval_trimestral: VARCHAR(20), NULL</text><text class="field" x="20" y="214">recuperatorio: VARCHAR(20), NULL · nota_final: VARCHAR(20), NULL</text><text class="field" x="20" y="244">periodo_evaluacion: VARCHAR(50), default '1° Trimestre'</text><text class="foot" x="20" y="268">No contiene todavía condición por materia ni eventos de exámenes libres.</text>
+  </g>
+
+  <g transform="translate(1410 135)">
+    <rect class="card" width="680" height="220"/><path class="head-finance" d="M12 0h656a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">FACTURA</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <text class="field" x="20" y="110">id_tutor → tutor.id: INTEGER, FK</text><text class="field" x="20" y="136">fecha_emision: DATE, default hoy · fecha_vencimiento: DATE, NULL</text><text class="field" x="20" y="162">total_pagar: FLOAT, default 0.0 · metodo_pago: VARCHAR(30)</text><text class="field" x="20" y="188">estado_pago: VARCHAR(30), default 'Pendiente'</text>
+  </g>
+  <g transform="translate(1410 375)">
+    <rect class="card" width="680" height="245"/><path class="head-finance" d="M12 0h656a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">DETALLE_FACTURA</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
+    <text class="field" x="20" y="110">id_factura → factura.id: INTEGER, FK</text><text class="field" x="20" y="136">id_matricula → matricula.id: INTEGER, FK</text><text class="field" x="20" y="162">concepto: VARCHAR(120), NOT NULL</text><text class="field" x="20" y="188">monto_base: FLOAT · descuento_aplicado: FLOAT</text><text class="field" x="20" y="214">recargo_mora: FLOAT · monto_final: FLOAT</text>
+  </g>
+  <g transform="translate(1410 640)">
+    <rect class="card" width="680" height="170"/><path class="head-ops" d="M12 0h656a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">ASISTENCIA</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text><text class="field" x="20" y="110">id_matricula → matricula.id: INTEGER, FK</text><text class="field" x="20" y="136">fecha: DATE, default hoy · hora_llegada: VARCHAR(10), NULL</text><text class="field" x="20" y="162">valor_falta: FLOAT, default 0.0</text>
+  </g>
+  <g transform="translate(1410 830)">
+    <rect class="card" width="680" height="195"/><path class="head-ops" d="M12 0h656a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">CERTIFICADO_MEDICO</text>
+    <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text><text class="field" x="20" y="110">id_matricula → matricula.id: INTEGER, FK</text><text class="field" x="20" y="136">fecha_emision: DATE, NULL · fecha_presentacion: DATE, NULL</text><text class="field" x="20" y="162">diagnostico_observacion: TEXT, NULL</text>
+  </g>
+  <g transform="translate(1410 1045)">
+    <rect class="panel" width="680" height="465"/><text class="paneltitle" x="22" y="38">Relaciones declaradas por claves foráneas</text>
+    <text class="relation" x="22" y="78">tutor 1:N alumno · tutor 1:N factura</text>
+    <text class="relation" x="22" y="106">alumno 1:N matricula · anio_lectivo 1:N matricula</text>
+    <text class="relation" x="22" y="134">grupo_seccion 1:N matricula · descuento_tipo 0..1:N matricula</text>
+    <text class="relation" x="22" y="162">nivel_grado 1:N grupo_seccion</text>
+    <text class="relation" x="22" y="190">docente 1:N curso_direccion</text>
+    <text class="relation" x="22" y="218">asignatura 1:N curso_direccion</text>
+    <text class="relation" x="22" y="246">grupo_seccion 1:N curso_direccion</text>
+    <text class="relation" x="22" y="274">matricula 1:N calificacion · curso_direccion 1:N calificacion</text>
+    <text class="relation" x="22" y="302">matricula 1:N asistencia · matricula 1:N certificado_medico</text>
+    <text class="relation" x="22" y="330">factura 1:N detalle_factura · matricula 1:N detalle_factura</text>
+    <path d="M22 350h636" stroke="#d7e0e9" stroke-width="2"/>
+    <text class="foot" x="22" y="380">ASPIRANTE_CRM no tiene relaciones FK declaradas todavía.</text>
+    <text class="foot" x="22" y="407">Los nombres y tipos reflejan models.py; UK = unique.</text>
+    <text class="foot" x="22" y="434">El esquema no implementa aún InscripcionMateria ni los</text><text class="foot" x="22" y="455">hitos académicos descritos en el diagrama de propuesta.</text>
+  </g>
+  <text class="foot" x="70" y="1690">Fuente del esquema: app/models.py. El diagrama representa modelos ORM, no una inspección de una base SQLite existente.</text>
+</svg>

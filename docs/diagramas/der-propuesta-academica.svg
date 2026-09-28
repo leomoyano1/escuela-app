@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1960" height="1600" viewBox="0 0 1960 1600" role="img" aria-labelledby="title desc">
+  <title id="title">Galileo Galilei - Propuesta DER academica</title>
+  <desc id="desc">Ampliacion propuesta del esquema para hitos de calendario, condicion por materia, notas historicas y revision de promocion. No implementada.</desc>
+  <defs>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #182230; }
+      .page { fill: #f4f7fb; }
+      .title { font-size: 36px; font-weight: 700; }
+      .subtitle { font-size: 17px; fill: #526174; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .head-existing { fill: #315b8a; }
+      .head-new { fill: #176b68; }
+      .head-warning { fill: #9a5b16; }
+      .headtext { fill: #ffffff; font-size: 19px; font-weight: 700; }
+      .field { font-size: 15px; }
+      .pk { font-size: 12px; font-weight: 700; fill: #ffffff; }
+      .badge { fill: #315b8a; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .paneltitle { font-size: 20px; font-weight: 700; }
+      .body { font-size: 15px; }
+      .note { font-size: 14px; fill: #526174; }
+      .label-existing { fill: #e7eff8; }
+      .label-new { fill: #e5f3f0; }
+    </style>
+  </defs>
+  <rect class="page" width="1960" height="1600"/>
+  <text class="title" x="60" y="62">Propuesta academica | Calendario, regularidad y promocion</text>
+  <text class="subtitle" x="60" y="94">Azul = entidad existente reutilizada · Verde = entidad propuesta, aun no implementada · No altera el DER actual</text>
+
+  <g transform="translate(60 130)">
+    <rect class="card" width="530" height="175"/><path class="head-existing" d="M12 0h506a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">ANIO_LECTIVO · EXISTENTE</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, numero_ciclo, fecha_inicio, fecha_fin</text>
+    <text class="note" x="18" y="112">Se reutiliza. Sus fechas actuales delimitan el ciclo;</text><text class="note" x="18" y="137">los cortes academicos se guardan en HITO_CALENDARIO.</text>
+  </g>
+  <g transform="translate(60 325)">
+    <rect class="card" width="530" height="145"/><path class="head-existing" d="M12 0h506a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">NIVEL_GRADO · EXISTENTE</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, nombre_nivel, grado_año</text>
+    <text class="note" x="18" y="116">Puede delimitar calendario y regla de evaluacion.</text>
+  </g>
+  <g transform="translate(60 490)">
+    <rect class="card" width="530" height="175"/><path class="head-existing" d="M12 0h506a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">MATRICULA · EXISTENTE</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, id_alumno, id_anio, id_grupo</text>
+    <text class="field" x="18" y="108">id_descuento, fecha_inscripcion, estado</text>
+    <text class="note" x="18" y="139">Conserva una fila historica por alumno y ciclo.</text>
+  </g>
+  <g transform="translate(60 685)">
+    <rect class="card" width="530" height="145"/><path class="head-existing" d="M12 0h506a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">ASIGNATURA · EXISTENTE</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, nombre_materia, carga_horaria</text>
+    <text class="note" x="18" y="116">Reutilizada como materia del registro academico.</text>
+  </g>
+  <g transform="translate(60 850)">
+    <rect class="card" width="530" height="255"/><path class="head-warning" d="M12 0h506a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">CALIFICACION · EXISTENTE / ADAPTAR</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, id_matricula, id_curso_dir, periodo_evaluacion</text>
+    <text class="field" x="18" y="108">diagnostico, parcial_1, parcial_2, eval_trimestral,</text><text class="field" x="18" y="133">recuperatorio, nota_final (VARCHAR(20))</text>
+    <text class="note" x="18" y="169">No es todavia un historial de intentos. Definir como</text><text class="note" x="18" y="193">vincularla a INSCRIPCION_MATERIA o migrar sus notas</text><text class="note" x="18" y="217">a eventos historicos antes de implementar el flujo.</text>
+  </g>
+
+  <g transform="translate(650 130)">
+    <rect class="card" width="560" height="205"/><path class="head-new" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">HITO_CALENDARIO · PROPUESTA</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id</text><text class="field" x="18" y="108">id_anio FK, id_nivel FK NULL, codigo</text><text class="field" x="18" y="135">fecha_inicio, fecha_fin</text>
+    <text class="note" x="18" y="171">Codigos: FIN_CURSADA_REGULAR, FIN_RECUPERACION,</text><text class="note" x="18" y="192">FIN_MESAS. Almacena fechas; no dispara acciones sola.</text>
+  </g>
+  <g transform="translate(650 355)">
+    <rect class="card" width="560" height="175"/><path class="head-new" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">REGLA_EVALUACION_CICLO · PROPUESTA</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, id_anio FK, id_nivel FK</text><text class="field" x="18" y="108">nota_minima_aprobacion: NUMERIC</text>
+    <text class="note" x="18" y="139">Guardar solo cuando la institucion confirme la regla.</text>
+  </g>
+  <g transform="translate(650 550)">
+    <rect class="card" width="560" height="185"/><path class="head-new" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">CONDICION_MATERIA · PROPUESTA</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, codigo, nombre</text>
+    <text class="field" x="18" y="108">IDs estables sembrados explicitamente:</text><text class="field" x="18" y="135">1 Aprobado · 2 Desaprobado · 3 Libre</text><text class="note" x="18" y="165">Condicion NULL mientras la materia se cursa.</text>
+  </g>
+  <g transform="translate(650 755)">
+    <rect class="card" width="560" height="235"/><path class="head-new" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">INSCRIPCION_MATERIA · PROPUESTA</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id</text><text class="field" x="18" y="108">id_matricula FK, id_asignatura FK</text><text class="field" x="18" y="135">id_regla_evaluacion FK</text><text class="field" x="18" y="162">id_condicion FK NULL</text>
+    <text class="note" x="18" y="197">Una materia para una matricula anual; unicidad por</text><text class="note" x="18" y="219">(id_matricula, id_asignatura).</text>
+  </g>
+  <g transform="translate(650 1010)">
+    <rect class="card" width="560" height="230"/><path class="head-new" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">REVISION_PROMOCION · PROPUESTA</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, id_matricula FK</text><text class="field" x="18" y="108">materias_adeudadas, estado_revision</text><text class="field" x="18" y="135">version_notas, confirmado_por, confirmado_en</text><text class="field" x="18" y="162">motivo, decision</text>
+    <text class="note" x="18" y="197">Alerta si hay mas de 2 materias distintas con</text><text class="note" x="18" y="219">condicion desaprobado o libre; requiere confirmacion.</text>
+  </g>
+
+  <g transform="translate(1270 130)">
+    <rect class="panel" width="630" height="535"/><text class="paneltitle" x="20" y="38">Relaciones propuestas</text>
+    <text class="body" x="20" y="78">ANIO_LECTIVO 1:N HITO_CALENDARIO</text><text class="body" x="20" y="108">NIVEL_GRADO 0..1:N HITO_CALENDARIO</text><text class="body" x="20" y="138">ANIO_LECTIVO + NIVEL_GRADO 1:N REGLA_EVALUACION_CICLO</text>
+    <text class="body" x="20" y="178">MATRICULA 1:N INSCRIPCION_MATERIA</text><text class="body" x="20" y="208">ASIGNATURA 1:N INSCRIPCION_MATERIA</text><text class="body" x="20" y="238">REGLA_EVALUACION_CICLO 1:N INSCRIPCION_MATERIA</text><text class="body" x="20" y="268">CONDICION_MATERIA 1:N INSCRIPCION_MATERIA</text>
+    <text class="body" x="20" y="308">MATRICULA 1:N REVISION_PROMOCION</text><text class="body" x="20" y="348">INSCRIPCION_MATERIA 1:N intentos/notas (por definir)</text>
+    <path d="M20 375h590" stroke="#d7e0e9" stroke-width="2"/>
+    <text class="paneltitle" x="20" y="414">Transiciones acordadas</text>
+    <text class="body" x="20" y="450">Cursando: condicion NULL</text><text class="body" x="20" y="480">Cierre regular: 1 aprobado o 2 desaprobado</text><text class="body" x="20" y="510">Fin recuperacion sin aprobar: 3 libre</text><text class="body" x="20" y="540">Examen libre aprobado: condicion vigente 1;</text><text class="body" x="20" y="565">el intento conserva que se rindio en condicion libre.</text><text class="body" x="20" y="605">Repitencia: alerta, nunca cambio automatico destructivo.</text>
+  </g>
+  <g transform="translate(1270 695)">
+    <rect class="panel" width="630" height="545"/><text class="paneltitle" x="20" y="38">Decisiones e integridad</text>
+    <text class="body" x="20" y="78">• Alerta cuando pendientes &gt; 2; contar asignaturas distintas.</text><text class="body" x="20" y="110">• Revisar despues de cargar/cerrar notas docentes.</text><text class="body" x="20" y="142">• Un usuario administrativo confirma la decision.</text><text class="body" x="20" y="174">• Recontar al confirmar y guardar version de notas.</text><text class="body" x="20" y="206">• Conservar ciclos, notas e intentos ya cerrados.</text>
+    <path d="M20 235h590" stroke="#d7e0e9" stroke-width="2"/>
+    <text class="paneltitle" x="20" y="274">Migracion desde CALIFICACION actual</text>
+    <text class="note" x="20" y="310">CALIFICACION hoy guarda varias notas en una fila por</text><text class="note" x="20" y="335">matricula/curso/periodo. No puede asumirse que equivale</text><text class="note" x="20" y="360">a un historial de intentos ni vincularse sin revisar datos.</text><text class="note" x="20" y="385">Definir transformacion antes de crear la nueva fuente de verdad.</text>
+    <path d="M20 410h590" stroke="#d7e0e9" stroke-width="2"/>
+    <text class="note" x="20" y="445">Todas las entidades verdes son propuestas. Las reglas de fechas,</text><text class="note" x="20" y="470">nota minima e intentos requieren configuracion institucional.</text><text class="note" x="20" y="495">No hay cambios de esquema implementados en este diagrama.</text>
+  </g>
+  <text class="note" x="60" y="1300">Propuesta de arquitectura: no representa tablas existentes ni sustituye el esquema actual. Fechas y notas de ejemplo deben definirse con la institucion.</text>
+</svg>
