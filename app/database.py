@@ -18,11 +18,9 @@ def init_db() -> None:
     for id_condicion, codigo, nombre in condiciones_iniciales:
         condicion = db.session.get(CondicionMateria, id_condicion)
         if condicion is None:
-            db.session.add(
-                CondicionMateria(
-                    id=id_condicion,
-                    codigo=codigo,
-                    nombre=nombre,
-                )
-            )
+            condicion = CondicionMateria()
+            condicion.id = id_condicion
+            condicion.codigo = codigo
+            condicion.nombre = nombre
+            db.session.add(condicion)
     db.session.commit()

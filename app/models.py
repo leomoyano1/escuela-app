@@ -36,6 +36,7 @@ class Alumno(db.Model):
 
     tutor = db.relationship("Tutor", back_populates="alumnos")
     matriculas = db.relationship("Matricula", back_populates="alumno", cascade="all, delete-orphan")
+    aspirante_origen = db.relationship("AspiranteCRM", back_populates="alumno", uselist=False)
 
 
 class AnioLectivo(db.Model):
@@ -49,6 +50,7 @@ class AnioLectivo(db.Model):
     fecha_fin = db.Column(db.Date, nullable=False)
 
     matriculas = db.relationship("Matricula", back_populates="anio_lectivo")
+    ciclos_escolares = db.relationship("CicloEscolar", back_populates="anio_lectivo")
 
 
 class NivelGrado(db.Model):
@@ -61,6 +63,29 @@ class NivelGrado(db.Model):
     grado_año = db.Column(db.String(100), nullable=False)
 
     grupos = db.relationship("GrupoSeccion", back_populates="nivel")
+    ciclos_escolares = db.relationship("CicloEscolar", back_populates="nivel")
+
+
+class CicloEscolar(db.Model):
+    """Período regular de cursada dentro de un año lectivo."""
+
+    __tablename__ = "ciclo_escolar"
+    __table_args__ = (
+        db.UniqueConstraint("id_anio", "id_nivel", name="uq_ciclo_escolar_anio_nivel"),
+        db.CheckConstraint(
+            "fecha_cierre >= fecha_apertura",
+            name="ck_ciclo_escolar_fechas",
+        ),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    id_anio = db.Column(db.Integer, db.ForeignKey("anio_lectivo.id"), nullable=False)
+    id_nivel = db.Column(db.Integer, db.ForeignKey("nivel_grado.id"), nullable=True)
+    fecha_apertura = db.Column(db.Date, nullable=False)
+    fecha_cierre = db.Column(db.Date, nullable=False)
+
+    anio_lectivo = db.relationship("AnioLectivo", back_populates="ciclos_escolares")
+    nivel = db.relationship("NivelGrado", back_populates="ciclos_escolares")
 
 
 class GrupoSeccion(db.Model):
@@ -118,6 +143,15 @@ class Matricula(db.Model):
     id_descuento = db.Column(db.Integer, db.ForeignKey("descuento_tipo.id"), nullable=True)
     fecha_inscripcion = db.Column(db.Date, nullable=False, default=date.today)
     estado = db.Column(db.String(50), nullable=False, default="Activa")
+    repitente = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0,
+        server_default="0",
+    )
+    __table_args__ = (
+        db.CheckConstraint("repitente IN (0, 1)", name="ck_matricula_repitente"),
+    )
 
     alumno = db.relationship("Alumno", back_populates="matriculas")
     anio_lectivo = db.relationship("AnioLectivo", back_populates="matriculas")
@@ -281,13 +315,53 @@ class DetalleFactura(db.Model):
 
 
 class AspiranteCRM(db.Model):
-    """Fichas de familias aspirantes para admisiones."""
+    """Datos precargados de una futura inscripción escolar."""
 
     __tablename__ = "aspirante_crm"
 
     id = db.Column(db.Integer, primary_key=True)
+    id_alumno = db.Column(db.Integer, db.ForeignKey("alumno.id"), unique=True, nullable=True)
+    id_anio = db.Column(db.Integer, db.ForeignKey("anio_lectivo.id"), nullable=True)
+    id_nivel = db.Column(db.Integer, db.ForeignKey("nivel_grado.id"), nullable=True)
+
+    nombre = db.Column(db.String(120), nullable=False)
+    apellido = db.Column(db.String(120), nullable=False)
+    dni = db.Column(db.String(20), nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    legajo = db.Column(db.String(50), nullable=True)
+
     nombre_tutor = db.Column(db.String(200), nullable=False)
+    dni_cuit_tutor = db.Column(db.String(20), nullable=False)
     telefono_whatsapp = db.Column(db.String(50), nullable=True)
+    email_tutor = db.Column(db.String(200), nullable=True)
+    direccion_tutor = db.Column(db.String(255), nullable=True)
     curso_interes = db.Column(db.String(100), nullable=True)
     estado_entrevista = db.Column(db.String(80), nullable=True)
+    estado = db.Column(db.String(30), nullable=False, default="En espera")
+    fecha_registro = db.Column(db.Date, nullable=False, default=date.today)
+
+    partida_nacimiento = db.Column(db.Integer, nullable=False, default=0, server_default="0")
+    documento = db.Column(db.Integer, nullable=False, default=0, server_default="0")
+    certificado_primaria = db.Column(db.Integer, nullable=False, default=0, server_default="0")
+    pase_otra_escuela = db.Column(db.Integer, nullable=False, default=0, server_default="0")
+    libre_deuda = db.Column(db.Integer, nullable=False, default=0, server_default="0")
+    plan_estudio = db.Column(db.Integer, nullable=False, default=0, server_default="0")
+    libro_matriz = db.Column(db.Integer, nullable=False, default=0, server_default="0")
+    materias_adeudadas = db.Column(db.Integer, nullable=False, default=0, server_default="0")
+
+    __table_args__ = (
+        db.CheckConstraint("partida_nacimiento IN (0, 1)", name="ck_aspirante_partida_nacimiento"),
+        db.CheckConstraint("documento IN (0, 1)", name="ck_aspirante_documento"),
+        db.CheckConstraint("certificado_primaria IN (0, 1)", name="ck_aspirante_certificado_primaria"),
+        db.CheckConstraint("pase_otra_escuela IN (0, 1)", name="ck_aspirante_pase_otra_escuela"),
+        db.CheckConstraint("libre_deuda IN (0, 1)", name="ck_aspirante_libre_deuda"),
+        db.CheckConstraint("plan_estudio IN (0, 1)", name="ck_aspirante_plan_estudio"),
+        db.CheckConstraint("libro_matriz IN (0, 1)", name="ck_aspirante_libro_matriz"),
+        db.CheckConstraint("materias_adeudadas IN (0, 1)", name="ck_aspirante_materias_adeudadas"),
+    )
+
     observaciones = db.Column(db.Text, nullable=True)
+
+    alumno = db.relationship("Alumno", back_populates="aspirante_origen")
+    anio_lectivo = db.relationship("AnioLectivo")
+    nivel = db.relationship("NivelGrado")
