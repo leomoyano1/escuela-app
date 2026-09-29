@@ -5,10 +5,11 @@ from typing import Any
 
 from flask import Flask
 
-from app.database import db
+from app.database import db, init_db
 from app.models import (
     Alumno,
     AnioLectivo,
+    CondicionMateria,
     DetalleFactura,
     DescuentoTipo,
     Factura,
@@ -46,7 +47,7 @@ class FuncionesExistentesTests(unittest.TestCase):
 
     def setUp(self):
         db.drop_all()
-        db.create_all()
+        init_db()
 
         self.tutor = crear_modelo(Tutor, nombre="Tutor", dni_cuit="T-1")
         self.anio = crear_modelo(
@@ -87,6 +88,14 @@ class FuncionesExistentesTests(unittest.TestCase):
 
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.get_json(), {"status": "ok", "app": "Galileo Galilei"})
+
+    def test_catalogo_de_condiciones_academicas_usa_ids_estables(self):
+        condiciones = db.session.query(CondicionMateria).order_by(CondicionMateria.id).all()
+
+        self.assertEqual(
+            [(condicion.id, condicion.codigo) for condicion in condiciones],
+            [(1, "APROBADO"), (2, "DESAPROBADO"), (3, "LIBRE")],
+        )
 
     def test_crea_factura_aplicando_descuento_y_mora(self):
         factura = crear_factura(

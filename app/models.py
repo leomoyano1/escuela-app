@@ -93,6 +93,19 @@ class DescuentoTipo(db.Model):
     matriculas = db.relationship("Matricula", back_populates="descuento_tipo")
 
 
+class CondicionMateria(db.Model):
+    """Catálogo estable de condiciones académicas por materia."""
+
+    __tablename__ = "condicion_materia"
+
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.String(30), unique=True, nullable=False)
+    nombre = db.Column(db.String(80), nullable=False)
+    activo = db.Column(db.Boolean, nullable=False, default=True)
+
+    inscripciones = db.relationship("InscripcionMateria", back_populates="condicion")
+
+
 class Matricula(db.Model):
     """Registro histórico del alumno en un año y grupo determinados."""
 
@@ -112,6 +125,11 @@ class Matricula(db.Model):
     descuento_tipo = db.relationship("DescuentoTipo", back_populates="matriculas")
 
     calificaciones = db.relationship("Calificacion", back_populates="matricula", cascade="all, delete-orphan")
+    inscripciones_materia = db.relationship(
+        "InscripcionMateria",
+        back_populates="matricula",
+        cascade="all, delete-orphan",
+    )
     asistencias = db.relationship("Asistencia", back_populates="matricula", cascade="all, delete-orphan")
     certificados = db.relationship("CertificadoMedico", back_populates="matricula", cascade="all, delete-orphan")
     detalles_factura = db.relationship("DetalleFactura", back_populates="matricula")
@@ -127,6 +145,25 @@ class Asignatura(db.Model):
     carga_horaria = db.Column(db.Integer, nullable=False, default=0)
 
     curso_direcciones = db.relationship("CursoDireccion", back_populates="asignatura")
+    inscripciones_materia = db.relationship("InscripcionMateria", back_populates="asignatura")
+
+
+class InscripcionMateria(db.Model):
+    """Relación entre una matrícula anual y una asignatura."""
+
+    __tablename__ = "inscripcion_materia"
+    __table_args__ = (
+        db.UniqueConstraint("id_matricula", "id_asignatura", name="uq_inscripcion_materia"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    id_matricula = db.Column(db.Integer, db.ForeignKey("matricula.id"), nullable=False)
+    id_asignatura = db.Column(db.Integer, db.ForeignKey("asignatura.id"), nullable=False)
+    id_condicion = db.Column(db.Integer, db.ForeignKey("condicion_materia.id"), nullable=True)
+
+    matricula = db.relationship("Matricula", back_populates="inscripciones_materia")
+    asignatura = db.relationship("Asignatura", back_populates="inscripciones_materia")
+    condicion = db.relationship("CondicionMateria", back_populates="inscripciones")
 
 
 class Docente(db.Model):
