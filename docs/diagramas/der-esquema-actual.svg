@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2160" height="1740" viewBox="0 0 2160 1740" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="2160" height="1840" viewBox="0 0 2160 1840" role="img" aria-labelledby="title desc">
   <title id="title">Galileo Galilei - DER del esquema ORM actual</title>
-  <desc id="desc">Diagrama de las 16 tablas SQLAlchemy existentes y sus claves foraneas declaradas en app/models.py.</desc>
+  <desc id="desc">Diagrama de las 19 tablas SQLAlchemy existentes y sus claves foraneas declaradas en app/models.py.</desc>
   <defs>
     <style>
       text { font-family: "Segoe UI", Arial, sans-serif; fill: #182230; }
@@ -27,7 +27,7 @@
   </defs>
   <rect class="page" width="2160" height="1740"/>
   <text class="title" x="70" y="64">Galileo Galilei | Esquema de base de datos actual</text>
-  <text class="subtitle" x="70" y="98">16 tablas ORM declaradas en app/models.py · PK = clave primaria · FK = clave foranea · UK = valor unico</text>
+  <text class="subtitle" x="70" y="98">19 tablas ORM declaradas en app/models.py · PK = clave primaria · FK = clave foranea · UK = valor unico</text>
 
   <g transform="translate(70 135)">
     <rect class="card" width="610" height="220"/><path class="head-core" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">TUTOR</text>
@@ -58,9 +58,9 @@
     <text class="field" x="20" y="110">nombre: VARCHAR(180), NOT NULL</text><rect class="badge-uk" x="18" y="120" width="38" height="20" rx="4"/><text class="key" x="25" y="135">UK</text><text class="field" x="68" y="136">legajo_laboral: VARCHAR(50), NOT NULL</text><text class="field" x="20" y="162">especialidad: VARCHAR(150), NULL</text>
   </g>
   <g transform="translate(70 1135)">
-    <rect class="card" width="610" height="195"/><path class="head-crm" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">ASPIRANTE_CRM</text>
+    <rect class="card" width="610" height="255"/><path class="head-crm" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">ASPIRANTE_CRM</text>
     <rect class="badge-pk" x="18" y="68" width="38" height="20" rx="4"/><text class="key" x="26" y="83">PK</text><text class="field" x="68" y="84">id: INTEGER</text>
-    <text class="field" x="20" y="110">nombre_tutor: VARCHAR(200), NOT NULL</text><text class="field" x="20" y="136">telefono_whatsapp: VARCHAR(50), NULL</text><text class="field" x="20" y="162">curso_interes: VARCHAR(100), NULL</text><text class="field" x="20" y="188">estado_entrevista: VARCHAR(80), NULL · observaciones: TEXT</text>
+    <text class="field" x="20" y="110">nombre_tutor · dni_cuit_tutor · telefono_whatsapp</text><text class="field" x="20" y="136">id_alumno → alumno.id: FK/UK/NULL</text><text class="field" x="20" y="162">id_anio → anio_lectivo.id · id_nivel → nivel_grado.id</text><text class="field" x="20" y="188">curso_interes · estado_entrevista · estado · fecha_registro</text><text class="field" x="20" y="214">Datos personales/tutor · domicilio · correo · observaciones</text><text class="field" x="20" y="240">Checklist documental: 8 flags enteros 0/1</text>
   </g>
 
   <g transform="translate(740 135)">
@@ -116,19 +116,34 @@
   <g transform="translate(1410 1045)">
     <rect class="panel" width="680" height="465"/><text class="paneltitle" x="22" y="38">Relaciones declaradas por claves foráneas</text>
     <text class="relation" x="22" y="78">tutor 1:N alumno · tutor 1:N factura</text>
-    <text class="relation" x="22" y="106">alumno 1:N matricula · anio_lectivo 1:N matricula</text>
+    <text class="relation" x="22" y="106">alumno 1:N matricula · anio_lectivo 1:N matricula/ciclo</text>
     <text class="relation" x="22" y="134">grupo_seccion 1:N matricula · descuento_tipo 0..1:N matricula</text>
-    <text class="relation" x="22" y="162">nivel_grado 1:N grupo_seccion</text>
+    <text class="relation" x="22" y="162">nivel_grado 1:N grupo_seccion/ciclo_escolar</text>
     <text class="relation" x="22" y="190">docente 1:N curso_direccion</text>
-    <text class="relation" x="22" y="218">asignatura 1:N curso_direccion</text>
+    <text class="relation" x="22" y="218">asignatura 1:N curso_direccion/inscripcion_materia</text>
     <text class="relation" x="22" y="246">grupo_seccion 1:N curso_direccion</text>
-    <text class="relation" x="22" y="274">matricula 1:N calificacion · curso_direccion 1:N calificacion</text>
+    <text class="relation" x="22" y="274">matricula 1:N calificacion/inscripcion_materia · curso 1:N calificacion</text>
     <text class="relation" x="22" y="302">matricula 1:N asistencia · matricula 1:N certificado_medico</text>
     <text class="relation" x="22" y="330">factura 1:N detalle_factura · matricula 1:N detalle_factura</text>
     <path d="M22 350h636" stroke="#d7e0e9" stroke-width="2"/>
-    <text class="foot" x="22" y="380">ASPIRANTE_CRM no tiene relaciones FK declaradas todavía.</text>
+    <text class="foot" x="22" y="380">Aspirante: FK a alumno, anio lectivo y nivel; alumno es unico.</text>
     <text class="foot" x="22" y="407">Los nombres y tipos reflejan models.py; UK = unique.</text>
-    <text class="foot" x="22" y="434">El esquema no implementa aún InscripcionMateria ni los</text><text class="foot" x="22" y="455">hitos académicos descritos en el diagrama de propuesta.</text>
+    <text class="foot" x="22" y="434">CicloEscolar, CondicionMateria e InscripcionMateria ya existen.</text><text class="foot" x="22" y="455">Hitos, reglas evaluativas e intentos historicos siguen pendientes.</text>
   </g>
-  <text class="foot" x="70" y="1690">Fuente del esquema: app/models.py. El diagrama representa modelos ORM, no una inspección de una base SQLite existente.</text>
+  <g transform="translate(70 1535)">
+    <rect class="card" width="610" height="190"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">CICLO_ESCOLAR</text>
+    <text class="field" x="20" y="82">id · id_anio FK · id_nivel FK/NULL</text><text class="field" x="20" y="110">fecha_apertura · fecha_cierre</text>
+    <text class="field" x="20" y="138">Unico por anio y nivel · cierre &gt;= apertura</text><text class="foot" x="20" y="170">Periodo regular dentro del anio lectivo.</text>
+  </g>
+  <g transform="translate(740 1535)">
+    <rect class="card" width="610" height="190"/><path class="head-academic" d="M12 0h586a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">CONDICION_MATERIA</text>
+    <text class="field" x="20" y="82">id PK · codigo UK · nombre · activo</text><text class="field" x="20" y="110">IDs estables: 1 APROBADO · 2 DESAPROBADO</text>
+    <text class="field" x="20" y="138">3 LIBRE</text><text class="foot" x="20" y="170">Catalogo de condicion academica por materia.</text>
+  </g>
+  <g transform="translate(1410 1535)">
+    <rect class="card" width="680" height="190"/><path class="head-academic" d="M12 0h656a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="20" y="34">INSCRIPCION_MATERIA</text>
+    <text class="field" x="20" y="82">id PK · id_matricula FK · id_asignatura FK</text><text class="field" x="20" y="110">id_condicion FK/NULL · unico por matricula/asignatura</text>
+    <text class="foot" x="20" y="145">La tabla y condicion existen en ORM; regla evaluativa</text><text class="foot" x="20" y="168">e historial de intentos todavia no estan modelados.</text>
+  </g>
+  <text class="foot" x="70" y="1810">Fuente del esquema: app/models.py. Representa modelos ORM y FKs declarados, no una inspeccion de la base SQLite.</text>
 </svg>

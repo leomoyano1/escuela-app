@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Gestión académica · Galileo Galilei{% endblock %}
+{% block content %}
+<h1>Niveles, asignaturas y grupos</h1>
+<p class="muted">Una división sin sección se identifica con la sección vacía.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+<section>
+  <h2>Niveles y grados</h2>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="entidad" value="nivel_grado">
+    <input type="hidden" name="operacion" value="crear">
+    <label for="nivel-nombre">Nivel</label>
+    <input id="nivel-nombre" name="nombre_nivel" maxlength="100" required>
+    <label for="nivel-grado">Grado/año</label>
+    <input id="nivel-grado" name="grado_año" maxlength="100" required>
+    <button type="submit">Agregar nivel/grado</button>
+  </form>
+  {% for nivel in niveles %}
+  <form method="post" class="catalog-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="entidad" value="nivel_grado">
+    <input type="hidden" name="operacion" value="editar">
+    <input type="hidden" name="id_registro" value="{{ nivel.id }}">
+    <label>Nivel
+      <input name="nombre_nivel" maxlength="100" value="{{ nivel.nombre_nivel }}" required>
+    </label>
+    <label>Grado/año
+      <input name="grado_año" maxlength="100" value="{{ nivel.grado_año }}" required>
+    </label>
+    <button class="secondary" type="submit">Guardar</button>
+  </form>
+  {% else %}<p class="muted">No hay niveles cargados.</p>{% endfor %}
+</section>
+
+<section>
+  <h2>Asignaturas</h2>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="entidad" value="asignatura">
+    <input type="hidden" name="operacion" value="crear">
+    <label for="materia-nombre">Nombre</label>
+    <input id="materia-nombre" name="nombre_materia" maxlength="150" required>
+    <label for="materia-carga">Carga horaria</label>
+    <input id="materia-carga" name="carga_horaria" type="number" min="0" step="1" value="0" required>
+    <button type="submit">Agregar asignatura</button>
+  </form>
+  {% for asignatura in asignaturas %}
+  <form method="post" class="catalog-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="entidad" value="asignatura">
+    <input type="hidden" name="operacion" value="editar">
+    <input type="hidden" name="id_registro" value="{{ asignatura.id }}">
+    <label>Nombre
+      <input name="nombre_materia" maxlength="150" value="{{ asignatura.nombre_materia }}" required>
+    </label>
+    <label>Carga horaria
+      <input name="carga_horaria" type="number" min="0" step="1" value="{{ asignatura.carga_horaria }}" required>
+    </label>
+    <button class="secondary" type="submit">Guardar</button>
+  </form>
+  {% else %}<p class="muted">No hay asignaturas cargadas.</p>{% endfor %}
+</section>
+
+<section>
+  <h2>Grupos/divisiones</h2>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="entidad" value="grupo_seccion">
+    <input type="hidden" name="operacion" value="crear">
+    <label for="grupo-nivel">Nivel/grado</label>
+    <select id="grupo-nivel" name="id_nivel" required>
+      <option value="">Seleccionar</option>
+      {% for nivel in niveles %}
+      <option value="{{ nivel.id }}">{{ nivel.nombre_nivel }} · {{ nivel.grado_año }}</option>
+      {% endfor %}
+    </select>
+    <label for="grupo-seccion">Sección (opcional)</label>
+    <input id="grupo-seccion" name="seccion" maxlength="50">
+    <label for="grupo-capacidad">Capacidad máxima</label>
+    <input id="grupo-capacidad" name="capacidad_maxima" type="number" min="1" step="1" value="30" required>
+    <button type="submit">Agregar grupo/división</button>
+  </form>
+  {% for grupo in grupos %}
+  <form method="post" class="catalog-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="entidad" value="grupo_seccion">
+    <input type="hidden" name="operacion" value="editar">
+    <input type="hidden" name="id_registro" value="{{ grupo.id }}">
+    <label>Nivel/grado
+      <select name="id_nivel" required>
+        {% for nivel in niveles %}
+        <option value="{{ nivel.id }}" {% if nivel.id == grupo.id_nivel %}selected{% endif %}>
+          {{ nivel.nombre_nivel }} · {{ nivel.grado_año }}
+        </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Sección (vacía = sin división)
+      <input name="seccion" maxlength="50" value="{{ grupo.seccion or '' }}">
+    </label>
+    <label>Capacidad máxima
+      <input name="capacidad_maxima" type="number" min="1" step="1" value="{{ grupo.capacidad_maxima }}" required>
+    </label>
+    <button class="secondary" type="submit">Guardar</button>
+  </form>
+  {% else %}<p class="muted">No hay grupos cargados.</p>{% endfor %}
+</section>
+<p><a class="button secondary" href="{{ url_for('main.index') }}">Volver al panel</a></p>
+{% endblock %}

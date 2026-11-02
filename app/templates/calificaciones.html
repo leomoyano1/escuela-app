@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Calificaciones · Galileo Galilei{% endblock %}
+{% block content %}
+<h1>Calificaciones trimestrales</h1>
+<p class="muted">
+  Cada carga agrega un intento. No se calcula aprobado/desaprobado ni se cambia la
+  condición vigente; la condición mostrada es la registrada al rendir.
+</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+<section>
+  <h2>Consultar intentos</h2>
+  <form method="get" action="{{ url_for('main.calificaciones') }}">
+    <label for="filtro-inscripcion">Matrícula y asignatura</label>
+    <select id="filtro-inscripcion" name="id_inscripcion">
+      <option value="">Todas las inscripciones</option>
+      {% for inscripcion in inscripciones %}
+      <option value="{{ inscripcion.id }}"
+        {% if inscripcion.id == id_inscripcion %}selected{% endif %}>
+        {{ inscripcion.matricula.anio_lectivo.numero_ciclo }} ·
+        {{ inscripcion.matricula.alumno.apellido }}, {{ inscripcion.matricula.alumno.nombre }} ·
+        {{ inscripcion.asignatura.nombre_materia }} ·
+        {% if inscripcion.id_condicion %}{{ inscripcion.condicion.nombre }}{% else %}En cursada{% endif %}
+      </option>
+      {% endfor %}
+    </select>
+    <label for="filtro-trimestre">Trimestre</label>
+    <select id="filtro-trimestre" name="trimestre">
+      {% for numero in (1, 2, 3) %}
+      <option value="{{ numero }}" {% if numero == trimestre %}selected{% endif %}>
+        {{ numero }}° Trimestre
+      </option>
+      {% endfor %}
+    </select>
+    <p class="actions"><button type="submit">Consultar</button></p>
+  </form>
+</section>
+
+<section>
+  <h2>Registrar intento</h2>
+  <form method="post" action="{{ url_for('main.calificaciones') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="inscripcion">Matrícula y asignatura</label>
+    <select id="inscripcion" name="id_inscripcion_materia" required>
+      <option value="">Seleccionar</option>
+      {% for inscripcion in inscripciones %}
+      <option value="{{ inscripcion.id }}"
+        {% if inscripcion.id == id_inscripcion %}selected{% endif %}>
+        {{ inscripcion.matricula.anio_lectivo.numero_ciclo }} ·
+        {{ inscripcion.matricula.alumno.apellido }}, {{ inscripcion.matricula.alumno.nombre }} ·
+        {{ inscripcion.asignatura.nombre_materia }}
+      </option>
+      {% endfor %}
+    </select>
+    <label for="trimestre">Trimestre</label>
+    <select id="trimestre" name="trimestre" required>
+      {% for numero in (1, 2, 3) %}
+      <option value="{{ numero }}" {% if numero == trimestre %}selected{% endif %}>
+        {{ numero }}° Trimestre
+      </option>
+      {% endfor %}
+    </select>
+    <label for="tipo-evaluacion">Instancia</label>
+    <select id="tipo-evaluacion" name="tipo_evaluacion" required>
+      <option value="">Seleccionar</option>
+      {% for codigo, etiqueta in tipos_evaluacion.items() %}
+      <option value="{{ codigo }}" {% if codigo == tipo_evaluacion %}selected{% endif %}>
+        {{ etiqueta }}
+      </option>
+      {% endfor %}
+    </select>
+    <label for="valor">Nota (entero de 1 a 10 o A)</label>
+    <input id="valor" name="valor" maxlength="2" pattern="(?:[1-9]|10|A)"
+      autocomplete="off" value="{{ valor }}" required>
+    <p class="actions"><button type="submit">Guardar intento</button></p>
+  </form>
+</section>
+
+<section>
+  <h2>Historial de intentos</h2>
+  {% if intentos %}
+  <ul>
+    {% for intento in intentos %}
+    <li>
+      {{ intento.registrado_en.strftime("%Y-%m-%d %H:%M UTC") }} ·
+      {{ intento.inscripcion_materia.matricula.alumno.apellido }},
+      {{ intento.inscripcion_materia.matricula.alumno.nombre }} ·
+      {{ intento.inscripcion_materia.asignatura.nombre_materia }} ·
+      {{ intento.trimestre }}° trimestre ·
+      {{ tipos_evaluacion[intento.tipo_evaluacion] }}: <strong>{{ intento.valor }}</strong> ·
+      condición al rendir:
+      {% if intento.condicion_rendida %}{{ intento.condicion_rendida.nombre }}{% else %}En cursada (sin condición){% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No hay intentos para los filtros seleccionados.</p>
+  {% endif %}
+  <p class="muted">
+    Las calificaciones históricas anteriores a esta función permanecen conservadas en su
+    registro original y no se convierten automáticamente a intentos.
+  </p>
+</section>
+<p><a class="button secondary" href="{{ url_for('main.index') }}">Volver al panel</a></p>
+{% endblock %}

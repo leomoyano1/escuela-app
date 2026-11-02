@@ -4,6 +4,8 @@ import webview
 from werkzeug.serving import make_server
 
 from app import create_app
+from app.config import Config
+from app.database import migrar_esquema
 
 
 server = None
@@ -19,6 +21,8 @@ def serve_app(app) -> None:
 def launch_desktop() -> None:
     """Abrir la aplicación con PyWebView en una ventana nativa."""
     app = create_app()
+    Config.prepare_storage()
+    migrar_esquema(app)
     threading.Thread(target=serve_app, args=(app,), daemon=True).start()
 
     webview.create_window(

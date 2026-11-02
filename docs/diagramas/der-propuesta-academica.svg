@@ -25,12 +25,12 @@
   </defs>
   <rect class="page" width="1960" height="1600"/>
   <text class="title" x="60" y="62">Propuesta academica | Calendario, regularidad y promocion</text>
-  <text class="subtitle" x="60" y="94">Azul = entidad existente reutilizada · Verde = entidad propuesta, aun no implementada · No altera el DER actual</text>
+  <text class="subtitle" x="60" y="94">Azul = entidad existente · Verde = propuesta pendiente · Ambar = entidad existente que requiere adaptacion</text>
 
   <g transform="translate(60 130)">
     <rect class="card" width="530" height="175"/><path class="head-existing" d="M12 0h506a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">ANIO_LECTIVO · EXISTENTE</text>
     <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, numero_ciclo, fecha_inicio, fecha_fin</text>
-    <text class="note" x="18" y="112">Se reutiliza. Sus fechas actuales delimitan el ciclo;</text><text class="note" x="18" y="137">los cortes academicos se guardan en HITO_CALENDARIO.</text>
+    <text class="note" x="18" y="112">Se reutiliza y agrupa ciclos regulares por nivel;</text><text class="note" x="18" y="137">los cortes academicos se guardan en HITO_CALENDARIO.</text>
   </g>
   <g transform="translate(60 325)">
     <rect class="card" width="530" height="145"/><path class="head-existing" d="M12 0h506a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">NIVEL_GRADO · EXISTENTE</text>
@@ -66,14 +66,14 @@
     <text class="note" x="18" y="139">Guardar solo cuando la institucion confirme la regla.</text>
   </g>
   <g transform="translate(650 550)">
-    <rect class="card" width="560" height="185"/><path class="head-new" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">CONDICION_MATERIA · PROPUESTA</text>
+    <rect class="card" width="560" height="185"/><path class="head-existing" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">CONDICION_MATERIA · EXISTENTE</text>
     <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, codigo, nombre</text>
     <text class="field" x="18" y="108">IDs estables sembrados explicitamente:</text><text class="field" x="18" y="135">1 Aprobado · 2 Desaprobado · 3 Libre</text><text class="note" x="18" y="165">Condicion NULL mientras la materia se cursa.</text>
   </g>
   <g transform="translate(650 755)">
-    <rect class="card" width="560" height="235"/><path class="head-new" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">INSCRIPCION_MATERIA · PROPUESTA</text>
-    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id</text><text class="field" x="18" y="108">id_matricula FK, id_asignatura FK</text><text class="field" x="18" y="135">id_regla_evaluacion FK</text><text class="field" x="18" y="162">id_condicion FK NULL</text>
-    <text class="note" x="18" y="197">Una materia para una matricula anual; unicidad por</text><text class="note" x="18" y="219">(id_matricula, id_asignatura).</text>
+    <rect class="card" width="560" height="235"/><path class="head-existing" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">INSCRIPCION_MATERIA · EXISTENTE</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id</text><text class="field" x="18" y="108">id_matricula FK, id_asignatura FK</text><text class="field" x="18" y="135">id_condicion FK NULL</text>
+    <text class="note" x="18" y="173">Unica por (id_matricula, id_asignatura).</text><text class="note" x="18" y="198">FK a regla evaluativa e historial de intentos:</text><text class="note" x="18" y="220">pendientes de implementar.</text>
   </g>
   <g transform="translate(650 1010)">
     <rect class="card" width="560" height="230"/><path class="head-new" d="M12 0h536a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">REVISION_PROMOCION · PROPUESTA</text>
@@ -83,7 +83,7 @@
 
   <g transform="translate(1270 130)">
     <rect class="panel" width="630" height="535"/><text class="paneltitle" x="20" y="38">Relaciones propuestas</text>
-    <text class="body" x="20" y="78">ANIO_LECTIVO 1:N HITO_CALENDARIO</text><text class="body" x="20" y="108">NIVEL_GRADO 0..1:N HITO_CALENDARIO</text><text class="body" x="20" y="138">ANIO_LECTIVO + NIVEL_GRADO 1:N REGLA_EVALUACION_CICLO</text>
+    <text class="body" x="20" y="78">ANIO_LECTIVO 1:N CICLO_ESCOLAR y HITO_CALENDARIO</text><text class="body" x="20" y="108">NIVEL_GRADO 0..1:N CICLO_ESCOLAR/HITO_CALENDARIO</text><text class="body" x="20" y="138">ANIO_LECTIVO + NIVEL_GRADO 1:N REGLA_EVALUACION_CICLO</text>
     <text class="body" x="20" y="178">MATRICULA 1:N INSCRIPCION_MATERIA</text><text class="body" x="20" y="208">ASIGNATURA 1:N INSCRIPCION_MATERIA</text><text class="body" x="20" y="238">REGLA_EVALUACION_CICLO 1:N INSCRIPCION_MATERIA</text><text class="body" x="20" y="268">CONDICION_MATERIA 1:N INSCRIPCION_MATERIA</text>
     <text class="body" x="20" y="308">MATRICULA 1:N REVISION_PROMOCION</text><text class="body" x="20" y="348">INSCRIPCION_MATERIA 1:N intentos/notas (por definir)</text>
     <path d="M20 375h590" stroke="#d7e0e9" stroke-width="2"/>
@@ -97,7 +97,12 @@
     <text class="paneltitle" x="20" y="274">Migracion desde CALIFICACION actual</text>
     <text class="note" x="20" y="310">CALIFICACION hoy guarda varias notas en una fila por</text><text class="note" x="20" y="335">matricula/curso/periodo. No puede asumirse que equivale</text><text class="note" x="20" y="360">a un historial de intentos ni vincularse sin revisar datos.</text><text class="note" x="20" y="385">Definir transformacion antes de crear la nueva fuente de verdad.</text>
     <path d="M20 410h590" stroke="#d7e0e9" stroke-width="2"/>
-    <text class="note" x="20" y="445">Todas las entidades verdes son propuestas. Las reglas de fechas,</text><text class="note" x="20" y="470">nota minima e intentos requieren configuracion institucional.</text><text class="note" x="20" y="495">No hay cambios de esquema implementados en este diagrama.</text>
+    <text class="note" x="20" y="445">HITO, REGLA, REVISION e historial de intentos siguen pendientes.</text><text class="note" x="20" y="470">Las fechas y la nota minima requieren configuracion institucional.</text><text class="note" x="20" y="495">CONDICION e INSCRIPCION ya existen; falta su FK a la regla.</text>
   </g>
-  <text class="note" x="60" y="1300">Propuesta de arquitectura: no representa tablas existentes ni sustituye el esquema actual. Fechas y notas de ejemplo deben definirse con la institucion.</text>
+  <g transform="translate(60 1280)">
+    <rect class="card" width="530" height="175"/><path class="head-existing" d="M12 0h506a12 12 0 0 1 12 12v42H0V12A12 12 0 0 1 12 0z"/><text class="headtext" x="18" y="34">CICLO_ESCOLAR · EXISTENTE</text>
+    <rect class="badge" x="18" y="66" width="36" height="19" rx="4"/><text class="pk" x="25" y="80">PK</text><text class="field" x="65" y="81">id, id_anio FK, id_nivel FK NULL</text>
+    <text class="field" x="18" y="108">fecha_apertura, fecha_cierre</text><text class="note" x="18" y="139">Periodo regular configurado por anio y nivel.</text>
+  </g>
+  <text class="note" x="60" y="1535">Esta vista complementa, no sustituye, el DER actual. Verde = pendiente; azul = entidad existente.</text>
 </svg>

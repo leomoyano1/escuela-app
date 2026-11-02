@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Asistencia · Galileo Galilei{% endblock %}
+{% block content %}
+<h1>Asistencia</h1>
+<p class="muted">
+  El valor se selecciona explícitamente. No se calcula a partir de la hora de llegada;
+  los cortes horarios están pendientes de definición institucional.
+</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+<section>
+  <h2>Registrar o corregir un día</h2>
+  <form method="post" action="{{ url_for('main.asistencias') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="matricula">Matrícula</label>
+    <select id="matricula" name="id_matricula" required>
+      <option value="">Seleccionar</option>
+      {% for matricula in matriculas %}
+      <option value="{{ matricula.id }}"
+        {% if matricula.id == id_matricula %}selected{% endif %}>
+        {{ matricula.anio_lectivo.numero_ciclo }} ·
+        {{ matricula.alumno.apellido }}, {{ matricula.alumno.nombre }} · matrícula {{ matricula.id }}
+      </option>
+      {% endfor %}
+    </select>
+    <label for="fecha">Fecha</label>
+    <input id="fecha" name="fecha" type="date" value="{{ fecha_hoy }}" required>
+    <label for="valor-falta">Valor de falta</label>
+    <select id="valor-falta" name="valor_falta" required>
+      <option value="0">0 · Presente</option>
+      <option value="0.5">0.5 · Media falta</option>
+      <option value="1">1 · Falta total</option>
+    </select>
+    <label>
+      <input type="checkbox" name="justificada" value="1">
+      Inasistencia justificada (validada por la cuenta autenticada)
+    </label>
+    <label for="observaciones">Observaciones</label>
+    <textarea id="observaciones" name="observaciones" rows="3"></textarea>
+    <p class="muted">Una justificación requiere un valor de falta distinto de 0.</p>
+    <p class="actions"><button type="submit">Guardar asistencia</button></p>
+  </form>
+</section>
+
+<section>
+  <h2>Consulta</h2>
+  <form method="get" action="{{ url_for('main.asistencias') }}">
+    <label for="filtro-matricula">Filtrar por matrícula</label>
+    <select id="filtro-matricula" name="id_matricula">
+      <option value="">Todas</option>
+      {% for matricula in matriculas %}
+      <option value="{{ matricula.id }}"
+        {% if matricula.id == id_matricula %}selected{% endif %}>
+        {{ matricula.anio_lectivo.numero_ciclo }} ·
+        {{ matricula.alumno.apellido }}, {{ matricula.alumno.nombre }} · matrícula {{ matricula.id }}
+      </option>
+      {% endfor %}
+    </select>
+    <p class="actions"><button type="submit">Consultar</button></p>
+  </form>
+  {% if id_matricula %}
+  <p>Faltas injustificadas acumuladas: <strong>{{ contadores.get(id_matricula, 0) }}</strong></p>
+  {% endif %}
+  {% if registros %}
+  <ul>
+    {% for asistencia in registros %}
+    <li>
+      {{ asistencia.fecha.isoformat() }} ·
+      {{ asistencia.matricula.alumno.apellido }}, {{ asistencia.matricula.alumno.nombre }} ·
+      matrícula {{ asistencia.id_matricula }} ·
+      {{ asistencia.valor_falta }} falta(s) ·
+      {% if asistencia.justificada %}
+        Justificada
+      {% else %}
+        No justificada
+      {% endif %}
+      {% if asistencia.justificada_por_id %}
+        · última validación de justificación por
+        {{ asistencia.justificada_por.username if asistencia.justificada_por else "cuenta registrada" }}
+        el {{ asistencia.justificada_en.strftime("%Y-%m-%d %H:%M UTC") if asistencia.justificada_en else "fecha no disponible" }}
+      {% endif %}
+      {% if asistencia.observaciones %} · {{ asistencia.observaciones }}{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No hay asistencias para los filtros seleccionados.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Avisos internos de faltas</h2>
+  {% if notificaciones %}
+  <ul>
+    {% for aviso in notificaciones %}
+    <li>
+      {{ aviso.generado_en.strftime("%Y-%m-%d %H:%M UTC") }} ·
+      {{ aviso.asistencia.matricula.alumno.apellido }},
+      {{ aviso.asistencia.matricula.alumno.nombre }} · matrícula
+      {{ aviso.asistencia.id_matricula }} ·
+      {{ aviso.faltas_injustificadas }} faltas injustificadas acumuladas
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No hay avisos de umbral registrados.</p>
+  {% endif %}
+  <p class="muted">
+    Los avisos no modifican matrícula ni condición académica. La reincorporación
+    y el cálculo de certificados médicos quedan fuera de esta tarea.
+  </p>
+</section>
+<p><a class="button secondary" href="{{ url_for('main.index') }}">Volver al panel</a></p>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Calendario escolar · Galileo Galilei{% endblock %}
+{% block styles %}
+  <style>
+    main { width: min(96vw, 68rem); }
+    .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 1.5rem; }
+    .calendar-panel { padding: 1rem; border: 1px solid #d8deea; border-radius: .5rem; }
+    .calendar-panel h2 { margin-top: 0; font-size: 1.2rem; }
+    select { box-sizing: border-box; width: 100%; padding: .7rem; border: 1px solid #b8c2d1; border-radius: .35rem; font: inherit; background: white; }
+    .record { padding: .75rem 0; border-top: 1px solid #e3e7ef; }
+    .record p { margin: .25rem 0; }
+    .record .button { margin-top: .5rem; }
+    .back { margin: 0 0 1rem; }
+    @media (max-width: 35rem) { main { padding: 1rem; } }
+  </style>
+{% endblock %}
+{% block content %}
+<p class="back"><a href="{{ url_for('main.index') }}">Volver al panel</a></p>
+<h1>Calendario institucional</h1>
+<p class="muted">El año lectivo y el ciclo regular son períodos distintos. Ingresá todas las fechas; no se completan fechas automáticamente.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+<div class="calendar-grid">
+  <section class="calendar-panel" aria-labelledby="years-title">
+    <h2 id="years-title">{% if anio_edicion %}Editar año lectivo{% else %}Crear año lectivo{% endif %}</h2>
+    {% set editar_anio = anio_edicion is not none %}
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="entidad" value="anio_lectivo">
+      <input type="hidden" name="operacion" value="{{ 'editar' if editar_anio else 'crear' }}">
+      {% if editar_anio %}<input type="hidden" name="id_registro" value="{{ anio_edicion.id }}">{% endif %}
+      <label for="numero_ciclo">Número de ciclo (identificador institucional)</label>
+      <input id="numero_ciclo" name="numero_ciclo" type="number" min="1" step="1" required
+             value="{{ formulario.get('numero_ciclo', anio_edicion.numero_ciclo if editar_anio else '') }}">
+      <label for="fecha_inicio">Inicio del año lectivo</label>
+      <input id="fecha_inicio" name="fecha_inicio" type="date" required
+             value="{{ formulario.get('fecha_inicio', anio_edicion.fecha_inicio.isoformat() if editar_anio else '') }}">
+      <label for="fecha_fin">Fin del año lectivo</label>
+      <input id="fecha_fin" name="fecha_fin" type="date" required
+             value="{{ formulario.get('fecha_fin', anio_edicion.fecha_fin.isoformat() if editar_anio else '') }}">
+      <div class="actions">
+        <button type="submit">{{ 'Guardar cambios' if editar_anio else 'Crear año lectivo' }}</button>
+        {% if editar_anio %}<a class="button secondary" href="{{ url_for('main.calendario') }}">Cancelar</a>{% endif %}
+      </div>
+    </form>
+
+    <h2>Años lectivos registrados</h2>
+    {% for anio in anios %}
+      <article class="record">
+        <p><strong>{{ anio.numero_ciclo }}</strong></p>
+        <p>{{ anio.fecha_inicio.isoformat() }} – {{ anio.fecha_fin.isoformat() }}</p>
+        <a class="button secondary" href="{{ url_for('main.calendario', editar_anio=anio.id) }}">Editar fechas</a>
+      </article>
+    {% else %}
+      <p class="muted">Todavía no hay años lectivos registrados.</p>
+    {% endfor %}
+  </section>
+
+  <section class="calendar-panel" aria-labelledby="cycles-title">
+    <h2 id="cycles-title">{% if ciclo_edicion %}Editar ciclo escolar{% else %}Crear ciclo escolar{% endif %}</h2>
+    {% set editar_ciclo = ciclo_edicion is not none %}
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="entidad" value="ciclo_escolar">
+      <input type="hidden" name="operacion" value="{{ 'editar' if editar_ciclo else 'crear' }}">
+      {% if editar_ciclo %}<input type="hidden" name="id_registro" value="{{ ciclo_edicion.id }}">{% endif %}
+      <label for="id_anio">Año lectivo</label>
+      <select id="id_anio" name="id_anio" required>
+        <option value="" disabled {% if not editar_ciclo and not formulario.get('id_anio') %}selected{% endif %}>Elegí un año lectivo</option>
+        {% for anio in anios %}
+          <option value="{{ anio.id }}"
+            {% if formulario.get('id_anio') == anio.id|string or (editar_ciclo and ciclo_edicion.id_anio == anio.id and not formulario) %}selected{% endif %}>
+            {{ anio.numero_ciclo }} ({{ anio.fecha_inicio.isoformat() }} – {{ anio.fecha_fin.isoformat() }})
+          </option>
+        {% endfor %}
+      </select>
+      <label for="id_nivel">Nivel (opcional)</label>
+      <select id="id_nivel" name="id_nivel" required>
+        <option value="" disabled {% if formulario.get('entidad') != 'ciclo_escolar' and not editar_ciclo %}selected{% endif %}>Elegí un nivel o ciclo global</option>
+        <option value="global"
+          {% if formulario.get('id_nivel') == 'global' or (editar_ciclo and ciclo_edicion.id_nivel is none and not formulario) %}selected{% endif %}>
+          Ciclo global, sin nivel
+        </option>
+        {% for nivel in niveles %}
+          <option value="{{ nivel.id }}"
+            {% if formulario.get('id_nivel') == nivel.id|string or (editar_ciclo and ciclo_edicion.id_nivel == nivel.id and not formulario) %}selected{% endif %}>
+            {{ nivel.nombre_nivel }} · {{ nivel.grado_año }}
+          </option>
+        {% endfor %}
+      </select>
+      <label for="fecha_apertura">Apertura del ciclo regular</label>
+      <input id="fecha_apertura" name="fecha_apertura" type="date" required
+             value="{{ formulario.get('fecha_apertura', ciclo_edicion.fecha_apertura.isoformat() if editar_ciclo else '') }}">
+      <label for="fecha_cierre">Cierre del ciclo regular</label>
+      <input id="fecha_cierre" name="fecha_cierre" type="date" required
+             value="{{ formulario.get('fecha_cierre', ciclo_edicion.fecha_cierre.isoformat() if editar_ciclo else '') }}">
+      <div class="actions">
+        <button type="submit">{{ 'Guardar cambios' if editar_ciclo else 'Crear ciclo escolar' }}</button>
+        {% if editar_ciclo %}<a class="button secondary" href="{{ url_for('main.calendario') }}">Cancelar</a>{% endif %}
+      </div>
+    </form>
+
+    <h2>Ciclos registrados</h2>
+    {% for ciclo in ciclos %}
+      <article class="record">
+        <p><strong>Año {{ ciclo.anio_lectivo.numero_ciclo }}</strong> ·
+          {% if ciclo.nivel %}{{ ciclo.nivel.nombre_nivel }} · {{ ciclo.nivel.grado_año }}{% else %}Global, sin nivel{% endif %}</p>
+        <p>{{ ciclo.fecha_apertura.isoformat() }} – {{ ciclo.fecha_cierre.isoformat() }}</p>
+        <a class="button secondary" href="{{ url_for('main.calendario', editar_ciclo=ciclo.id) }}">Editar ciclo</a>
+      </article>
+    {% else %}
+      <p class="muted">Todavía no hay ciclos escolares registrados.</p>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Editar alumno · Galileo Galilei{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('main.alumnos') }}">Volver a alumnos y tutores</a></p>
+<h1>Editar alumno</h1>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <label for="nombre">Nombre</label>
+  <input id="nombre" name="nombre" maxlength="120" value="{{ alumno.nombre }}" required>
+  <label for="apellido">Apellido</label>
+  <input id="apellido" name="apellido" maxlength="120" value="{{ alumno.apellido }}" required>
+  <label for="dni">DNI</label>
+  <input id="dni" name="dni" maxlength="20" value="{{ alumno.dni }}" required>
+  <label for="fecha_nacimiento">Fecha de nacimiento</label>
+  <input id="fecha_nacimiento" name="fecha_nacimiento" type="date"
+         value="{{ alumno.fecha_nacimiento.isoformat() if alumno.fecha_nacimiento else '' }}" required>
+  <p class="muted">Legajo escolar: {{ alumno.legajo or 'Sin legajo registrado' }}. No editable desde este mantenimiento.</p>
+  <div class="actions">
+    <button type="submit">Guardar cambios</button>
+    <a class="button secondary" href="{{ url_for('main.alumnos') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

@@ -2,20 +2,28 @@ import unittest
 from datetime import date
 from decimal import Decimal
 from typing import Any
+from unittest.mock import call, patch
 
 from flask import Flask
+from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 
-from app.database import db, init_db
+from app.config import BASE_DIR, Config
+from app.database import db, sembrar_catalogos_iniciales
 from app.models import (
     Alumno,
+    Asistencia,
     AnioLectivo,
     Asignatura,
     AspiranteCRM,
+    Calificacion,
+    CertificadoMedico,
     CicloEscolar,
     CondicionMateria,
+    CursoDireccion,
     DetalleFactura,
     DescuentoTipo,
+    Docente,
     Factura,
     GrupoSeccion,
     InscripcionMateria,
@@ -28,7 +36,11 @@ from app.services import (
     ConceptoFacturable,
     DatosAspirante,
     crear_factura,
+    dar_de_baja_alumno,
+    dar_de_baja_aspirante,
+    dar_de_baja_matricula,
     listar_aspirantes,
+    listar_aspirantes_archivados,
     registrar_aspirante,
 )
 
@@ -57,8 +69,10 @@ class FuncionesExistentesTests(unittest.TestCase):
         cls.context.pop()
 
     def setUp(self):
+        db.session.remove()
         db.drop_all()
-        init_db()
+        db.create_all()
+        sembrar_catalogos_iniciales()
 
         self.tutor = crear_modelo(Tutor, nombre="Tutor", dni_cuit="T-1")
         self.anio = crear_modelo(
@@ -102,11 +116,25 @@ class FuncionesExistentesTests(unittest.TestCase):
         )
         db.session.commit()
 
-    def test_ruta_raiz_responde_estado_ok(self):
-        respuesta = self.app.test_client().get("/")
+    def test_health_responde_estado_ok(self):
+        respuesta = self.app.test_client().get("/health")
 
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.get_json(), {"status": "ok", "app": "Galileo Galilei"})
+
+    @patch("app.config.os.makedirs")
+    def test_prepara_directorios_locales_al_iniciar(self, makedirs: Any):
+        Config.prepare_storage()
+
+        makedirs.assert_has_calls(
+            [
+                call(BASE_DIR / "data" / "uploads", exist_ok=True),
+                call(BASE_DIR / "exports", exist_ok=True),
+                call(BASE_DIR / "backups", exist_ok=True),
+                call(BASE_DIR / "logs", exist_ok=True),
+            ]
+        )
+        self.assertEqual(makedirs.call_count, 4)
 
     def test_catalogo_de_condiciones_academicas_usa_ids_estables(self):
         condiciones = db.session.query(CondicionMateria).order_by(CondicionMateria.id).all()
@@ -140,6 +168,144 @@ class FuncionesExistentesTests(unittest.TestCase):
             db.session.commit()
 
         db.session.rollback()
+
+    def crear_historial_academico_y_financiero(self):
+        asignatura = crear_modelo(Asignatura, nombre_materia="Matemática")
+        docente = crear_modelo(
+            Docente,
+            nombre="Docente",
+            legajo_laboral="D-1",
+        )
+        curso = crear_modelo(
+            CursoDireccion,
+            docente=docente,
+            asignatura=asignatura,
+            grupo=self.grupo,
+        )
+        inscripcion = crear_modelo(
+            InscripcionMateria,
+            matricula=self.matricula,
+            asignatura=asignatura,
+            id_condicion=2,
+        )
+        calificacion = crear_modelo(
+            Calificacion,
+            matricula=self.matricula,
+            curso_direccion=curso,
+            nota_final="4",
+        )
+        asistencia = crear_modelo(
+            Asistencia,
+            matricula=self.matricula,
+            fecha=date(2026, 6, 2),
+            valor_falta=0.5,
+        )
+        certificado = crear_modelo(
+            CertificadoMedico,
+            matricula=self.matricula,
+            fecha_presentacion=date(2026, 6, 3),
+            diagnostico_observacion="Certificado presentado",
+        )
+        db.session.add_all(
+            [
+                asignatura,
+                docente,
+                curso,
+                inscripcion,
+                calificacion,
+                asistencia,
+                certificado,
+            ]
+        )
+        factura = crear_factura(
+            self.tutor.id,
+            [ConceptoFacturable(self.matricula.id, "Cuota", Decimal("100"))],
+        )
+        return inscripcion, calificacion, asistencia, certificado, factura
+
+    def test_bajas_logicas_preservan_historial_academico_y_financiero(self):
+        inscripcion, calificacion, asistencia, certificado, factura = (
+            self.crear_historial_academico_y_financiero()
+        )
+
+        with self.assertRaisesRegex(ValueError, "motivo de baja"):
+            dar_de_baja_matricula(self.matricula.id, "  ")
+
+        matricula = dar_de_baja_matricula(
+            self.matricula.id,
+            "Traslado a otro establecimiento",
+            date(2026, 7, 1),
+        )
+        alumno = dar_de_baja_alumno(
+            self.alumno.id,
+            "Traslado a otra localidad",
+            date(2026, 7, 2),
+        )
+
+        self.assertEqual(matricula.estado, "Activa")
+        self.assertEqual(matricula.fecha_baja, date(2026, 7, 1))
+        self.assertEqual(matricula.motivo_baja, "Traslado a otro establecimiento")
+        self.assertEqual(alumno.fecha_baja, date(2026, 7, 2))
+        self.assertEqual(alumno.motivo_baja, "Traslado a otra localidad")
+        self.assertEqual(db.session.get(Matricula, self.matricula.id).id_alumno, alumno.id)
+        self.assertIsNotNone(db.session.get(InscripcionMateria, inscripcion.id))
+        self.assertEqual(db.session.get(Calificacion, calificacion.id).nota_final, "4")
+        self.assertEqual(db.session.get(Asistencia, asistencia.id).valor_falta, 0.5)
+        self.assertIsNotNone(db.session.get(CertificadoMedico, certificado.id))
+        self.assertEqual(db.session.get(Factura, factura.id).estado_pago, "Pendiente")
+        self.assertEqual(
+            db.session.query(DetalleFactura).filter_by(id_factura=factura.id).count(),
+            1,
+        )
+        with self.assertRaisesRegex(ValueError, "ya tiene una baja"):
+            dar_de_baja_matricula(
+                self.matricula.id,
+                "No reemplazar el motivo original",
+            )
+        self.assertEqual(matricula.motivo_baja, "Traslado a otro establecimiento")
+
+    def test_baja_logica_de_aspirante_no_altera_su_estado_de_inscripcion(self):
+        aspirante = registrar_aspirante(
+            DatosAspirante(
+                nombre="Luis",
+                apellido="Sol",
+                dni="A-8",
+                fecha_nacimiento=date(2012, 4, 10),
+                nombre_tutor="Tutor Sol",
+                dni_cuit_tutor="T-8",
+            )
+        )
+
+        aspirante = dar_de_baja_aspirante(
+            aspirante.id,
+            "La familia desistió del trámite",
+        )
+
+        self.assertEqual(aspirante.estado, "En espera")
+        self.assertEqual(aspirante.fecha_baja, date.today())
+        self.assertEqual(aspirante.motivo_baja, "La familia desistió del trámite")
+        self.assertIsNone(aspirante.id_alumno)
+        self.assertEqual(listar_aspirantes(), [])
+        self.assertEqual(listar_aspirantes_archivados(), [aspirante])
+
+    def test_no_permite_borrado_fisico_ni_desvinculacion_de_matriculas(self):
+        self.crear_historial_academico_y_financiero()
+
+        with self.assertRaisesRegex(ValueError, "baja lógica"):
+            db.session.delete(self.alumno)
+            db.session.flush()
+        db.session.rollback()
+
+        with self.assertRaisesRegex(ValueError, "baja lógica"):
+            db.session.execute(delete(Matricula).where(Matricula.id == self.matricula.id))
+
+        self.alumno.matriculas.remove(self.matricula)
+        with self.assertRaises(IntegrityError):
+            db.session.flush()
+        db.session.rollback()
+
+        self.assertIsNotNone(db.session.get(Alumno, self.alumno.id))
+        self.assertIsNotNone(db.session.get(Matricula, self.matricula.id))
 
     def test_condicion_libre_identifica_la_materia_previa(self):
         asignatura = crear_modelo(Asignatura, nombre_materia="Matemática")

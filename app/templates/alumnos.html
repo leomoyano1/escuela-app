@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Alumnos y tutores · Galileo Galilei{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('main.index') }}">Volver al panel</a></p>
+<h1>Mantenimiento de alumnos y tutores</h1>
+<p class="muted">Solo se editan registros existentes. No se crean matrículas ni se modifica el legajo desde esta pantalla.</p>
+
+<section>
+  <h2>Alumnos activos</h2>
+  {% for alumno in alumnos %}
+  <p><a href="{{ url_for('main.editar_alumno', id_alumno=alumno.id) }}">
+    {{ alumno.apellido }}, {{ alumno.nombre }}
+  </a></p>
+  {% else %}
+  <p class="muted">No hay alumnos activos cargados.</p>
+  {% endfor %}
+</section>
+
+<section>
+  <h2>Tutores existentes</h2>
+  {% for tutor in tutores %}
+  <p><a href="{{ url_for('main.editar_tutor', id_tutor=tutor.id) }}">{{ tutor.nombre }}</a></p>
+  {% else %}
+  <p class="muted">No hay tutores cargados.</p>
+  {% endfor %}
+</section>
+{% endblock %}

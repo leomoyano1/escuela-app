@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Panel · Galileo Galilei{% endblock %}
+{% block content %}
+<h1>Panel de gestión escolar</h1>
+<p>Sesión iniciada como <strong>{{ usuario.username }}</strong>.</p>
+<p class="muted">El acceso está protegido y las acciones quedan registradas en la bitácora local.</p>
+<div class="actions">
+  <a class="button" href="{{ url_for('main.calendario') }}">Administrar calendario</a>
+  <a class="button" href="{{ url_for('main.academico') }}">Administrar niveles, asignaturas y grupos</a>
+  <a class="button" href="{{ url_for('main.alumnos') }}">Alumnos y tutores</a>
+  <a class="button" href="{{ url_for('main.calificaciones') }}">Calificaciones trimestrales</a>
+  <a class="button" href="{{ url_for('main.asistencias') }}">Asistencia y avisos</a>
+  <a class="button" href="{{ url_for('main.accounts') }}">Administrar cuentas</a>
+  <a class="button" href="{{ url_for('main.auditoria') }}">Bitácora de auditoría</a>
+  <form method="post" action="{{ url_for('main.logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
+    <button class="secondary" type="submit">Cerrar sesión</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Cuentas · Galileo Galilei{% endblock %}
+{% block content %}
+<h1>Cuentas del personal</h1>
+<p>Las cuentas tienen los mismos permisos dentro de la aplicación.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<ul>
+  {% for cuenta in usuarios %}
+  <li><strong>{{ cuenta.username }}</strong> · {{ "Activa" if cuenta.activo else "Inactiva" }}</li>
+  {% endfor %}
+</ul>
+<h2>Crear cuenta</h2>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <label for="username">Usuario</label>
+  <input id="username" name="username" autocomplete="off" minlength="3" maxlength="64" required>
+  <label for="password">Contraseña (mínimo 12 caracteres)</label>
+  <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" required>
+  <label for="confirm_password">Confirmar contraseña</label>
+  <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" minlength="12" required>
+  <div class="actions">
+    <button type="submit">Crear cuenta</button>
+    <a class="button secondary" href="{{ url_for('main.index') }}">Volver al panel</a>
+  </div>
+</form>
+{% endblock %}

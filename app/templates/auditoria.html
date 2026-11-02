@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Bitácora de auditoría · Galileo Galilei{% endblock %}
+{% block content %}
+<h1>Bitácora de auditoría</h1>
+<p>Consulta de solo lectura. Los detalles sensibles y las credenciales se ocultan.</p>
+{% if integridad_valida %}
+<p role="status">Integridad local verificada.</p>
+{% else %}
+<p class="error" role="alert">No se pudo verificar la integridad de la bitácora. Conserva la base y el respaldo para revisión.</p>
+{% endif %}
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form method="get" action="{{ url_for('main.auditoria') }}">
+  <div class="catalog-row">
+    <label for="usuario">Usuario
+      <select id="usuario" name="usuario">
+        <option value="">Todos</option>
+        {% for usuario in usuarios %}
+        <option value="{{ usuario.id }}" {% if filtros.usuario == usuario.id|string %}selected{% endif %}>{{ usuario.username }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label for="desde">Desde
+      <input id="desde" name="desde" type="date" value="{{ filtros.desde }}">
+    </label>
+    <label for="hasta">Hasta
+      <input id="hasta" name="hasta" type="date" value="{{ filtros.hasta }}">
+    </label>
+    <label for="entidad">Entidad
+      <select id="entidad" name="entidad">
+        <option value="">Todas</option>
+        {% for entidad in entidades %}
+        <option value="{{ entidad }}" {% if filtros.entidad == entidad %}selected{% endif %}>{{ entidad }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label for="accion">Acción
+      <select id="accion" name="accion">
+        <option value="">Todas</option>
+        {% for accion in acciones %}
+        <option value="{{ accion }}" {% if filtros.accion == accion %}selected{% endif %}>{{ accion }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="actions">
+    <button type="submit">Filtrar</button>
+    <a class="button secondary" href="{{ url_for('main.auditoria') }}">Limpiar filtros</a>
+    <a class="button secondary" href="{{ url_for('main.index') }}">Volver al panel</a>
+  </div>
+</form>
+<p class="muted">{{ cantidad_total }} evento(s); se muestran hasta 50 por página.</p>
+{% if eventos %}
+  {% for fila in eventos %}
+  <section>
+    <h2>{{ fila.evento.accion }} · {{ fila.evento.entidad }}</h2>
+    <p>
+      <strong>Fecha UTC:</strong> {{ fila.evento.ocurrido_en }}
+      · <strong>Usuario:</strong> {{ fila.evento.actor.username if fila.evento.actor else "Sin usuario asociado" }}
+      · <strong>Registro:</strong> {{ fila.evento.entidad_id or "—" }}
+      · <strong>Resultado:</strong> {{ fila.evento.resultado }}
+    </p>
+    <details>
+      <summary>Detalles (valores sensibles redactados)</summary>
+      <pre>{{ fila.detalles | tojson(indent=2) }}</pre>
+    </details>
+  </section>
+  {% endfor %}
+{% else %}
+<p>No hay eventos para los filtros seleccionados.</p>
+{% endif %}
+{% if paginas > 1 %}
+<nav aria-label="Paginación de auditoría" class="actions">
+  {% if pagina > 1 %}
+  <a class="button secondary" href="{{ url_for('main.auditoria', usuario=filtros.usuario, desde=filtros.desde, hasta=filtros.hasta, entidad=filtros.entidad, accion=filtros.accion, pagina=pagina - 1) }}">Anterior</a>
+  {% endif %}
+  <span>Página {{ pagina }} de {{ paginas }}</span>
+  {% if pagina < paginas %}
+  <a class="button secondary" href="{{ url_for('main.auditoria', usuario=filtros.usuario, desde=filtros.desde, hasta=filtros.hasta, entidad=filtros.entidad, accion=filtros.accion, pagina=pagina + 1) }}">Siguiente</a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endblock %}
