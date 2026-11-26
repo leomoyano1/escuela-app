@@ -13,6 +13,8 @@ class Config:
         f"sqlite:///{BASE_DIR / 'data' / 'galileo.db'}",
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MP_ACCESS_TOKEN = os.environ.get("MP_ACCESS_TOKEN")
+    MP_NOTIFICATION_URL = os.environ.get("MP_NOTIFICATION_URL")
     UPLOAD_FOLDER = str(BASE_DIR / "data" / "uploads")
     EXPORT_FOLDER = str(BASE_DIR / "exports")
     BACKUP_FOLDER = str(BASE_DIR / "backups")

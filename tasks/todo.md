@@ -97,6 +97,49 @@
 - Verificación global: suite completa 70/70 y `git diff --check`; tests del visor cubren sesión, filtros, redacción, auditoría de lectura, integridad, ausencia de mutaciones y creación/restauración de respaldos. Se inició `main.py` con almacenamiento temporal y se probó el flujo de cuenta inicial → panel → bitácora mediante el navegador local; queda pendiente confirmar la interacción dentro de la ventana nativa PyWebView.
 - Dependencias: Tareas 3–9; Tarea 10 no bloquea esta superficie independiente.
 
+## Fase 5: Evolución (CRM, Facturación y Reportes)
+
+### Tarea 12: CRM de Aspirantes (Backend)
+**Descripción:** Implementar la lógica y rutas para el manejo de aspirantes, utilizando el modelo existente `AspiranteCRM`.
+**Criterios de aceptación:**
+- [ ] CRUD funcional para aspirantes.
+- [ ] Validación de checklist documental.
+- [ ] Auditoría de cambios de estado.
+**Dependencias:** Tarea 7 (Matrícula).
+**Files:** `app/services.py`, `app/routes.py`.
+**Sizing:** Medium.
+
+### Tarea 13: Facturación y Pagos (Backend)
+**Descripción:** Implementar servicios financieros para la gestión de cuotas y pagos.
+**Criterios de aceptación:**
+- [ ] Generación automática de cuotas.
+- [ ] Registro de pagos.
+- [ ] Auditoría financiera.
+**Dependencias:** Tarea 12.
+**Files:** `app/services.py`, `app/routes.py`.
+**Sizing:** Medium.
+
+### Tarea 14: Motor de Reportes PDF
+**Descripción:** Implementar motor de reportes usando `reportlab` para boletines y constancias.
+**Criterios de aceptación:**
+- [ ] Generación PDF de boletín.
+- [ ] Generación PDF de constancia.
+**Dependencias:** Tarea 8.
+**Files:** `app/services.py`.
+**Sizing:** Small.
+
+## Fase 6: Interfaz de Usuario (UI)
+
+### Tarea 15: UI para CRM, Facturación y Reportes
+**Descripción:** Implementar las vistas (templates) correspondientes para los nuevos módulos.
+**Criterios de aceptación:**
+- [ ] UI funcional para CRM de Aspirantes.
+- [ ] UI funcional para Facturación.
+- [ ] UI para descarga de reportes.
+**Dependencias:** Tarea 12, 13, 14.
+**Files:** `app/templates/*.html`.
+**Sizing:** Large.
+
 ## Checkpoints
 - [x] **Cimientos:** migración/backup probados, bajas lógicas no destruyen historial, cuentas locales y auditoría funcionan.
 - [x] **SIS operativo:** año/ciclo, matrícula y división histórica integrados con notas y asistencia.

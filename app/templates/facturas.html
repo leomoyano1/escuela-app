@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Facturación · Galileo Galilei{% endblock %}
+{% block content %}
+<h1>Listado de facturas</h1>
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fecha Emisión</th>
+        <th>Tutor</th>
+        <th>Total</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for factura in facturas %}
+      <tr>
+        <td>{{ factura.id }}</td>
+        <td>{{ factura.fecha_emision }}</td>
+        <td>{{ factura.tutor.nombre }}</td>
+        <td>${{ "%.2f"|format(factura.total_pagar) }}</td>
+        <td>
+          <span class="status-badge {{ factura.estado_pago.lower() }}">
+            {{ factura.estado_pago }}
+          </span>
+        </td>
+        <td>
+          {% if factura.estado_pago.lower() != 'aprobado' %}
+          <a class="button small" href="{{ url_for('main.pagar_factura', id_factura=factura.id) }}">
+            Cobrar
+          </a>
+          {% else %}
+          <span class="muted">Pagada</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" class="center">No hay facturas registradas.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="actions">
+  <a class="button secondary" href="{{ url_for('main.index') }}">Volver al panel</a>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+flowchart LR
+    U[Operador local]
+    W[PyWebView]
+    M[main.py\nFlask server en 127.0.0.1:5000]
+    APP[create_app\nFlask-Login / Flask-Migrate]
+    R[Blueprint main\nroutes.py]
+    S[services.py\nreglas de dominio]
+    AUD[audit.py\ncadena SHA-256]
+    ORM[SQLAlchemy ORM]
+    DB[(SQLite local)]
+    MIG[Alembic\nmigrations/versions]
+    FS[Carpetas locales\nbackups / data / logs / exports]
+
+    U --> W --> M --> APP
+    APP --> R
+    R --> S
+    R --> AUD
+    S --> ORM
+    S --> AUD
+    AUD --> ORM
+    ORM --> DB
+    M --> MIG
+    MIG --> DB
+    APP --> FS
+    M --> FS

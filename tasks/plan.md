@@ -80,8 +80,19 @@ Plan propuesto a partir de las decisiones confirmadas con el comprador. La prime
 | Auditoría de datos sensibles | El antes/después puede duplicar PII | Guardar solo campos modificados, nunca secretos; diseñar almacenamiento local protegido y vistas sin contenido innecesario |
 | Reincorporación médica | No está definido el denominador del 66% | Resolver antes del flujo de reincorporación |
 
-## Fuera de alcance de la primera fase
-- Cambios al legajo y formulario de inscripción/CRM de aspirantes.
-- ERP, facturas, mora, pagos y recibos; sus reglas confirmadas quedan reservadas para esa etapa.
-- LMS, exportaciones ministeriales, migración de datos de terceros y utilidades de soporte IT.
-- Roles/permisos diferenciados.
+## Fase 8: Evolución del Sistema
+
+### Sub-fase 8.1: CRM de Aspirantes (Backend)
+- Implementar servicios para gestión integral de aspirantes CRM.
+- Implementar rutas para alta, listado y edición de aspirantes.
+- Validar estados documentales en servicios.
+
+### Sub-fase 8.2: Facturación y Pagos (Backend)
+- Implementar servicios financieros (generación de cuotas, registro de pagos).
+- Implementar rutas financieras.
+
+### Sub-fase 8.3: Reportes PDF (Motor)
+- Implementar motor de reportes usando `reportlab` para boletines y constancias.
+
+### Fase 9: UI (Interfaz de Usuario)
+- Desarrollar UI para CRM, Facturación y Reportes.

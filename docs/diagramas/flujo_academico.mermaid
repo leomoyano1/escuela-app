@@ -1,0 +1,10 @@
+stateDiagram-v2
+    state "NULL: cursando, sin condición establecida" as Cursando
+    state "1: APROBADO" as Aprobado
+    state "2: DESAPROBADO" as Desaprobado
+    state "3: LIBRE" as Libre
+    note right of Cursando
+        Estados disponibles en el catálogo/modelo.
+        No hay transición automática de condición implementada.
+        Los intentos guardan la condición vigente como instantánea.
+    end note

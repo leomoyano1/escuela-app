@@ -1,0 +1,25 @@
+sequenceDiagram
+    actor U as Usuario autenticado
+    participant R as Ruta Flask
+    participant S as Servicio de dominio
+    participant DB as SQLAlchemy / SQLite
+    participant A as audit.py
+
+    U->>R: POST con token CSRF valido
+    R->>S: Validar y ejecutar operacion
+    S->>DB: Cambiar entidad y flush
+    S->>A: registrar_evento_auditoria()
+    A->>DB: Leer hash del evento anterior
+    A->>A: Serializar campos canonicos y calcular SHA-256
+    A->>DB: Agregar EventoAuditoria a la misma sesion
+    S->>DB: commit()
+    alt commit exitoso
+        DB-->>S: Transaccion confirmada
+        S-->>R: Resultado de dominio
+        R-->>U: Redireccion o respuesta
+    else error antes o durante el commit
+        S->>DB: rollback()
+        DB-->>S: Cambio y evento revertidos juntos
+        S-->>R: Propagar error
+        R-->>U: Error segun el flujo de ruta
+    end

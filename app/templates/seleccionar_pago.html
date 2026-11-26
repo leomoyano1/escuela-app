@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Seleccionar método de pago · Galileo Galilei{% endblock %}
+{% block content %}
+<h1>Seleccionar método de pago</h1>
+<p>Factura #{{ factura.id }} - Total: ${{ "%.2f"|format(factura.total_pagar) }}</p>
+
+<div class="actions">
+    <a class="button" href="{{ url_for('main.pagar_factura', id_factura=factura.id, metodo='mercadopago') }}">
+        Pagar con MercadoPago
+    </a>
+    
+    <form method="POST" action="{{ url_for('main.pagar_factura', id_factura=factura.id, metodo='efectivo') }}" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="button secondary" type="submit">Registrar Pago en Efectivo</button>
+    </form>
+</div>
+<p><a href="{{ url_for('main.facturas') }}">Volver</a></p>
+{% endblock %}

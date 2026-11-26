@@ -43,6 +43,7 @@ from app.services import (
     listar_aspirantes_archivados,
     registrar_aspirante,
 )
+from app.pagos import crear_preferencia_pago
 
 
 def crear_modelo(modelo: Any, **atributos: Any) -> Any:

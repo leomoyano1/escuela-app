@@ -1,0 +1,59 @@
+classDiagram
+    class Tutor
+    class Usuario
+    class EventoAuditoria
+    class Alumno
+    class AnioLectivo
+    class NivelGrado
+    class CicloEscolar
+    class GrupoSeccion
+    class DescuentoTipo
+    class CondicionMateria
+    class Matricula
+    class HistorialGrupoMatricula
+    class Asignatura
+    class InscripcionMateria
+    class Docente
+    class CursoDireccion
+    class Calificacion
+    class IntentoCalificacion
+    class Asistencia
+    class NotificacionAsistencia
+    class CertificadoMedico
+    class Factura
+    class DetalleFactura
+    class AspiranteCRM
+
+    Tutor "1" --> "0..*" Alumno : responsable
+    Tutor "1" --> "0..*" Factura : titular
+    Usuario "0..1" --> "0..*" EventoAuditoria : actor
+    Usuario "1" --> "0..*" IntentoCalificacion : registra
+    Usuario "0..1" --> "0..*" Asistencia : justifica
+    Usuario "1" --> "0..*" NotificacionAsistencia : genera
+    AnioLectivo "1" --> "0..*" Matricula : agrupa
+    AnioLectivo "1" --> "0..*" CicloEscolar : contiene
+    NivelGrado "0..1" --> "0..*" CicloEscolar : delimita
+    NivelGrado "1" --> "0..*" GrupoSeccion : organiza
+    Alumno "1" --> "0..*" Matricula : cursa
+    Alumno "0..1" --> "0..1" AspiranteCRM : origen
+    GrupoSeccion "1" --> "0..*" Matricula : grupo actual
+    GrupoSeccion "1" --> "0..*" HistorialGrupoMatricula : asignaciones
+    Matricula "1" --> "0..*" HistorialGrupoMatricula : historial
+    DescuentoTipo "0..1" --> "0..*" Matricula : descuento
+    Matricula "1" --> "0..*" InscripcionMateria : materias
+    Asignatura "1" --> "0..*" InscripcionMateria : cursada
+    CondicionMateria "0..1" --> "0..*" InscripcionMateria : condicion vigente
+    InscripcionMateria "1" --> "0..*" IntentoCalificacion : intentos
+    CondicionMateria "0..1" --> "0..*" IntentoCalificacion : condicion rendida
+    Docente "1" --> "0..*" CursoDireccion : asignaciones
+    Asignatura "1" --> "0..*" CursoDireccion : dictado
+    GrupoSeccion "1" --> "0..*" CursoDireccion : curso
+    Matricula "1" --> "0..*" Calificacion : notas legacy
+    CursoDireccion "1" --> "0..*" Calificacion : notas legacy
+    Matricula "1" --> "0..*" Asistencia : asistencia
+    Asistencia "1" --> "0..*" NotificacionAsistencia : alertas
+    Matricula "1" --> "0..*" CertificadoMedico : certificados
+    Matricula "1" --> "0..*" DetalleFactura : cargos
+    Factura "1" --> "0..*" DetalleFactura : conceptos
+    AnioLectivo "0..1" --> "0..*" AspiranteCRM : interes
+    NivelGrado "0..1" --> "0..*" AspiranteCRM : interes

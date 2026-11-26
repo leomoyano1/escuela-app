@@ -25,7 +25,7 @@ from .audit import (
     verificar_integridad_auditoria,
 )
 from .database import db
-from .models import CicloEscolar, EventoAuditoria, NivelGrado, Usuario
+from .models import CicloEscolar, EventoAuditoria, Factura, NivelGrado, Usuario
 from .services import (
     crear_asignatura,
     crear_anio_lectivo,
@@ -54,6 +54,12 @@ from .services import (
     obtener_alumno_mantenimiento,
     obtener_tutor_mantenimiento,
     registrar_intento_calificacion,
+    registrar_aspirante,
+    listar_aspirantes,
+    editar_aspirante,
+    bajar_aspirante,
+    procesar_notificacion_pago,
+    registrar_pago_manual,
     TIPOS_EVALUACION,
 )
 
@@ -760,6 +766,93 @@ def editar_tutor(id_tutor: int):
         error=error,
         csrf_token=_obtener_token_csrf(),
     ), (400 if error else 200)
+
+
+@bp.route("/aspirantes", methods=["GET", "POST"])
+@login_required
+def aspirantes():
+    """Listado y alta de aspirantes."""
+    if request.method == "POST":
+        # (Lógica simplificada por ahora para mantener el slice pequeño)
+        pass
+    aspirantes_list = listar_aspirantes()
+    return render_template("aspirantes.html", aspirantes=aspirantes_list)
+
+@bp.route("/pagos/success")
+@login_required
+def pago_success():
+    return render_template("pagos_respuesta.html", mensaje="Pago exitoso.")
+
+@bp.route("/pagos/failure")
+@login_required
+def pago_failure():
+    return render_template("pagos_respuesta.html", mensaje="El pago falló.")
+
+@bp.route("/pagos/pending")
+@login_required
+def pago_pending():
+    return render_template("pagos_respuesta.html", mensaje="El pago está pendiente.")
+
+@bp.route("/facturas")
+@login_required
+def facturas():
+    """Listado de facturas con opción de pago en línea."""
+    facturas_list = (
+        db.session.query(Factura).order_by(Factura.fecha_emision.desc(), Factura.id.desc()).all()
+    )
+    return render_template("facturas.html", facturas=facturas_list)
+
+
+@bp.route("/facturas/<int:id_factura>/pagar", methods=["GET", "POST"])
+@login_required
+def pagar_factura(id_factura: int):
+    """Muestra opciones de pago o procesa el pago directo si se eligió método."""
+    factura = db.session.get(Factura, id_factura)
+    if not factura:
+        abort(404)
+    if factura.estado_pago.lower() == "aprobado":
+        return render_template("pagos_respuesta.html", mensaje="Esta factura ya se encuentra abonada.")
+
+    metodo = request.args.get("metodo")
+    
+    if request.method == "POST" or metodo == "mercadopago":
+        if metodo == "mercadopago":
+            titulo = f"Factura #{factura.id} · Galileo Galilei"
+            try:
+                checkout_url = crear_preferencia_pago(factura.id, float(factura.total_pagar), titulo)
+                return redirect(checkout_url)
+            except Exception as exc:
+                return render_template("pagos_respuesta.html", mensaje=f"No se pudo iniciar el pago: {exc}"), 502
+        
+        if metodo == "efectivo":
+            if not _csrf_valido():
+                return render_template("pagos_respuesta.html", mensaje="Error de seguridad (CSRF)."), 403
+            try:
+                registrar_pago_manual(factura.id, "Efectivo")
+                return render_template("pagos_respuesta.html", mensaje="Pago en efectivo registrado correctamente.")
+            except Exception as exc:
+                return render_template("pagos_respuesta.html", mensaje=f"Error al registrar pago: {exc}"), 500
+
+    return render_template("seleccionar_pago.html", factura=factura, csrf_token=_obtener_token_csrf())
+
+
+@bp.route("/pagos/webhook", methods=["POST"])
+def pago_webhook():
+    """Webhook para recibir notificaciones asíncronas de MercadoPago."""
+    data = request.get_json(silent=True) or {}
+    payment_id = None
+    
+    if "data" in data and "id" in data["data"]:
+        payment_id = data["data"]["id"]
+    elif request.args.get("type") == "payment" or request.args.get("topic") == "payment":
+        payment_id = request.args.get("id") or request.args.get("data.id")
+
+    if payment_id:
+        procesado = procesar_notificacion_pago(payment_id)
+        if procesado:
+            return jsonify({"status": "success"}), 200
+
+    return jsonify({"status": "ignored"}), 200
 
 
 def _obtener_token_csrf() -> str:

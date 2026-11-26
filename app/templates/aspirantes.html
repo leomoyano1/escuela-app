@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Aspirantes</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>DNI</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for aspirante in aspirantes %}
+        <tr>
+            <td>{{ aspirante.nombre }}</td>
+            <td>{{ aspirante.apellido }}</td>
+            <td>{{ aspirante.dni }}</td>
+            <td>{{ aspirante.estado }}</td>
+            <td><a href="{{ url_for('main.editar_aspirante_route', id_aspirante=aspirante.id) }}">Editar</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

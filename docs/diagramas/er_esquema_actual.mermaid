@@ -1,0 +1,251 @@
+erDiagram
+    TUTOR ||--o{ ALUMNO : responsable
+    TUTOR ||--o{ FACTURA : titular
+    ALUMNO ||--o{ MATRICULA : historico
+    ANIO_LECTIVO ||--o{ MATRICULA : periodo
+    ANIO_LECTIVO ||--o{ CICLO_ESCOLAR : contiene
+    NIVEL_GRADO o|--o{ CICLO_ESCOLAR : aplica
+    NIVEL_GRADO ||--o{ GRUPO_SECCION : organiza
+    GRUPO_SECCION ||--o{ MATRICULA : vigente
+    GRUPO_SECCION ||--o{ HISTORIAL_GRUPO_MATRICULA : asignacion
+    MATRICULA ||--o{ HISTORIAL_GRUPO_MATRICULA : registra
+    DESCUENTO_TIPO o|--o{ MATRICULA : descuento
+    MATRICULA ||--o{ INSCRIPCION_MATERIA : cursa
+    ASIGNATURA ||--o{ INSCRIPCION_MATERIA : asignatura
+    CONDICION_MATERIA o|--o{ INSCRIPCION_MATERIA : vigente
+    INSCRIPCION_MATERIA ||--o{ INTENTO_CALIFICACION : intentos
+    CONDICION_MATERIA o|--o{ INTENTO_CALIFICACION : rendida
+    DOCENTE ||--o{ CURSO_DIRECCION : asignacion
+    ASIGNATURA ||--o{ CURSO_DIRECCION : materia
+    GRUPO_SECCION ||--o{ CURSO_DIRECCION : grupo
+    MATRICULA ||--o{ CALIFICACION : legacy
+    CURSO_DIRECCION ||--o{ CALIFICACION : legacy
+    MATRICULA ||--o{ ASISTENCIA : registra
+    ASISTENCIA ||--o{ NOTIFICACION_ASISTENCIA : genera
+    MATRICULA ||--o{ CERTIFICADO_MEDICO : adjunta
+    MATRICULA ||--o{ DETALLE_FACTURA : cargo
+    FACTURA ||--o{ DETALLE_FACTURA : detalla
+    ALUMNO o|--o| ASPIRANTE_CRM : origen
+    ANIO_LECTIVO o|--o{ ASPIRANTE_CRM : interesa
+    NIVEL_GRADO o|--o{ ASPIRANTE_CRM : interesa
+    USUARIO o|--o{ EVENTO_AUDITORIA : actor
+    USUARIO ||--o{ INTENTO_CALIFICACION : registra
+    USUARIO o|--o{ ASISTENCIA : justifica
+    USUARIO ||--o{ NOTIFICACION_ASISTENCIA : genera
+
+    TUTOR {
+        int id PK
+        string nombre
+        string dni_cuit UK
+        string email
+        string telefono
+        string direccion
+    }
+    USUARIO {
+        int id PK
+        string username UK
+        string password_hash
+        bool activo
+        datetime creado_en
+    }
+    EVENTO_AUDITORIA {
+        int id PK
+        int actor_id FK
+        string ocurrido_en
+        string accion
+        string entidad
+        string entidad_id
+        string resultado
+        text detalles_json
+        string hash_anterior
+        string hash_evento UK
+    }
+    ALUMNO {
+        int id PK
+        int id_tutor FK
+        string nombre
+        string apellido
+        string dni UK
+        date fecha_nacimiento
+        string legajo UK
+        date fecha_baja
+        text motivo_baja
+    }
+    ANIO_LECTIVO {
+        int id PK
+        int numero_ciclo UK
+        date fecha_inicio
+        date fecha_fin
+    }
+    NIVEL_GRADO {
+        int id PK
+        string nombre_nivel
+        string grado_año
+    }
+    CICLO_ESCOLAR {
+        int id PK
+        int id_anio FK
+        int id_nivel FK
+        date fecha_apertura
+        date fecha_cierre
+    }
+    GRUPO_SECCION {
+        int id PK
+        int id_nivel FK
+        string seccion
+        int capacidad_maxima
+    }
+    DESCUENTO_TIPO {
+        int id PK
+        string codigo UK
+        string nombre
+        float porcentaje
+        text descripcion
+        bool activo
+    }
+    CONDICION_MATERIA {
+        int id PK
+        string codigo UK
+        string nombre
+        bool activo
+    }
+    MATRICULA {
+        int id PK
+        int id_alumno FK
+        int id_anio FK
+        int id_grupo FK
+        int id_descuento FK
+        date fecha_inscripcion
+        string estado
+        date fecha_baja
+        text motivo_baja
+        int repitente
+    }
+    HISTORIAL_GRUPO_MATRICULA {
+        int id PK
+        int id_matricula FK
+        int id_grupo FK
+        date fecha_desde
+        date fecha_hasta
+    }
+    ASIGNATURA {
+        int id PK
+        string nombre_materia
+        int carga_horaria
+    }
+    INSCRIPCION_MATERIA {
+        int id PK
+        int id_matricula FK
+        int id_asignatura FK
+        int id_condicion FK
+    }
+    DOCENTE {
+        int id PK
+        string nombre
+        string legajo_laboral UK
+        string especialidad
+    }
+    CURSO_DIRECCION {
+        int id PK
+        int id_docente FK
+        int id_asignatura FK
+        int id_grupo FK
+        string horario
+    }
+    CALIFICACION {
+        int id PK
+        int id_matricula FK
+        int id_curso_dir FK
+        string diagnostico
+        string parcial_1
+        string parcial_2
+        string eval_trimestral
+        string recuperatorio
+        string nota_final
+        string periodo_evaluacion
+    }
+    INTENTO_CALIFICACION {
+        int id PK
+        int id_inscripcion_materia FK
+        int trimestre
+        string tipo_evaluacion
+        string valor
+        int id_condicion_rendida FK
+        int actor_id FK
+        datetime registrado_en
+    }
+    ASISTENCIA {
+        int id PK
+        int id_matricula FK
+        date fecha
+        string hora_llegada
+        float valor_falta
+        bool justificada
+        text observaciones
+        int justificada_por_id FK
+        datetime justificada_en
+    }
+    NOTIFICACION_ASISTENCIA {
+        int id PK
+        int id_asistencia FK
+        numeric faltas_injustificadas
+        datetime generado_en
+        int actor_id FK
+    }
+    CERTIFICADO_MEDICO {
+        int id PK
+        int id_matricula FK
+        date fecha_emision
+        date fecha_presentacion
+        text diagnostico_observacion
+    }
+    FACTURA {
+        int id PK
+        int id_tutor FK
+        date fecha_emision
+        date fecha_vencimiento
+        float total_pagar
+        string metodo_pago
+        string estado_pago
+    }
+    DETALLE_FACTURA {
+        int id PK
+        int id_factura FK
+        int id_matricula FK
+        string concepto
+        float monto_base
+        float descuento_aplicado
+        float recargo_mora
+        float monto_final
+    }
+    ASPIRANTE_CRM {
+        int id PK
+        int id_alumno FK
+        int id_anio FK
+        int id_nivel FK
+        string nombre
+        string apellido
+        string dni
+        date fecha_nacimiento
+        string legajo
+        string nombre_tutor
+        string dni_cuit_tutor
+        string telefono_whatsapp
+        string email_tutor
+        string direccion_tutor
+        string curso_interes
+        string estado_entrevista
+        string estado
+        date fecha_registro
+        date fecha_baja
+        text motivo_baja
+        int partida_nacimiento
+        int documento
+        int certificado_primaria
+        int pase_otra_escuela
+        int libre_deuda
+        int plan_estudio
+        int libro_matriz
+        int materias_adeudadas
+        text observaciones
+    }

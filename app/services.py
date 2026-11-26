@@ -181,6 +181,75 @@ def listar_aspirantes_archivados(estado: str | None = None) -> list[AspiranteCRM
     return aspirantes
 
 
+def editar_aspirante(id_aspirante: int, datos: DatosAspirante) -> AspiranteCRM:
+    """Modificar ficha de aspirante, auditado."""
+    aspirante = db.session.get(AspiranteCRM, id_aspirante)
+    if not aspirante or aspirante.fecha_baja is not None:
+        raise ValueError("Aspirante no encontrado o inactivo.")
+
+    valores_anteriores = {c.name: getattr(aspirante, c.name) for c in aspirante.__table__.columns}
+
+    aspirante.nombre = _texto_requerido(datos.nombre, "nombre")
+    aspirante.apellido = _texto_requerido(datos.apellido, "apellido")
+    aspirante.dni = _texto_requerido(datos.dni, "DNI")
+    aspirante.fecha_nacimiento = datos.fecha_nacimiento
+    aspirante.nombre_tutor = _texto_requerido(datos.nombre_tutor, "nombre del tutor")
+    aspirante.dni_cuit_tutor = _texto_requerido(datos.dni_cuit_tutor, "DNI/CUIT del tutor")
+    aspirante.telefono_whatsapp = _texto_opcional(datos.telefono_whatsapp)
+    aspirante.email_tutor = _texto_opcional(datos.email_tutor)
+    aspirante.direccion_tutor = _texto_opcional(datos.direccion_tutor)
+    aspirante.id_anio = datos.id_anio
+    aspirante.id_nivel = datos.id_nivel
+    aspirante.legajo = _texto_opcional(datos.legajo)
+    aspirante.curso_interes = _texto_opcional(datos.curso_interes)
+    aspirante.estado_entrevista = _texto_opcional(datos.estado_entrevista)
+    aspirante.observaciones = _texto_opcional(datos.observaciones)
+
+    # Actualización de flags
+    aspirante.partida_nacimiento = _flag_documental(datos.partida_nacimiento, "partida")
+    aspirante.documento = _flag_documental(datos.documento, "documento")
+    aspirante.certificado_primaria = _flag_documental(datos.certificado_primaria, "certificado")
+    aspirante.pase_otra_escuela = _flag_documental(datos.pase_otra_escuela, "pase")
+    aspirante.libre_deuda = _flag_documental(datos.libre_deuda, "libre deuda")
+    aspirante.plan_estudio = _flag_documental(datos.plan_estudio, "plan estudio")
+    aspirante.libro_matriz = _flag_documental(datos.libro_matriz, "libro matriz")
+    aspirante.materias_adeudadas = _flag_documental(datos.materias_adeudadas, "materias adeudadas")
+
+    try:
+        db.session.flush()
+        registrar_evento_auditoria(
+            "aspirante.editado",
+            "aspirante",
+            aspirante.id,
+            detalles={"antes": valores_anteriores, "despues": {c.name: getattr(aspirante, c.name) for c in aspirante.__table__.columns}},
+        )
+        db.session.commit()
+        return aspirante
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+def bajar_aspirante(id_aspirante: int, motivo: str) -> None:
+    """Dar de baja lógica a un aspirante, auditado."""
+    aspirante = db.session.get(AspiranteCRM, id_aspirante)
+    if not aspirante or aspirante.fecha_baja is not None:
+        raise ValueError("Aspirante no encontrado o ya inactivo.")
+
+    aspirante.fecha_baja = date.today()
+    aspirante.motivo_baja = _texto_requerido(motivo, "motivo de baja")
+    aspirante.estado = "Baja"
+
+    registrar_evento_auditoria(
+        "aspirante.baja",
+        "aspirante",
+        aspirante.id,
+        detalles={"motivo": motivo},
+    )
+    db.session.commit()
+    return aspirantes
+
+
 def listar_usuarios() -> list[Usuario]:
     usuarios = db.session.query(Usuario).order_by(Usuario.username).all()
     registrar_evento_auditoria(
@@ -1706,6 +1775,62 @@ def crear_factura(
     except Exception:
         db.session.rollback()
         raise
+
+
+def registrar_pago_manual(id_factura: int, metodo: str = "Efectivo") -> Factura:
+    """Registrar el pago de una factura de forma manual, auditado."""
+    factura = db.session.get(Factura, id_factura)
+    if not factura:
+        raise ValueError("Factura no encontrada.")
+    if factura.estado_pago.lower() == "aprobado":
+        raise ValueError("La factura ya se encuentra abonada.")
+
+    factura.estado_pago = "Aprobado"
+    factura.metodo_pago = metodo
+    try:
+        db.session.flush()
+        registrar_evento_auditoria(
+            "pago.manual_registrado",
+            "factura",
+            factura.id,
+            detalles={"metodo": metodo, "total": factura.total_pagar},
+        )
+        db.session.commit()
+        return factura
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+def procesar_notificacion_pago(payment_id: str) -> bool:
+    """Valida el pago en MP y actualiza el estado de la factura."""
+    token = current_app.config.get("MP_ACCESS_TOKEN")
+    sdk = mercadopago.SDK(token)
+    
+    # Obtener detalle del pago desde API de MP
+    payment_info = sdk.payment().get(payment_id)
+    if payment_info["status"] != 200:
+        return False
+        
+    payment = payment_info["response"]
+    factura_id = payment.get("external_reference")
+    status = payment.get("status") # ej: 'approved'
+    
+    if not factura_id:
+        return False
+        
+    factura = db.session.get(Factura, int(factura_id))
+    if factura:
+        factura.estado_pago = status.capitalize()
+        db.session.commit()
+        registrar_evento_auditoria(
+            "pago.actualizado",
+            "factura",
+            factura.id,
+            detalles={"payment_id": payment_id, "nuevo_estado": status}
+        )
+        return True
+    return False
 
 
 def _importe_no_negativo(importe: Decimal, nombre: str) -> Decimal:
