@@ -12,5 +12,6 @@ data/*
 backups/*
 exports/*
 logs/*
+docs/
 build/
 dist/
